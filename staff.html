@@ -2,702 +2,710 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,   initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Staff Panel - Macau Traffic Monitor</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <style>
         * {
-            margin:   0;
-            padding:   0;
-            box-sizing:   border-box;
-            font-family:   'Segoe UI',   Tahoma,   Geneva,   Verdana,   sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         body {
-            background:   linear-gradient(rgba(0,   0,   0,   0.8),   rgba(0,   0,   0,   0.8)),   
+            background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), 
                         url('https://img1.wsimg.com/isteam/getty/2154404610') no-repeat center center fixed;
-            background-size:   cover;
-            color:   #fff;
-            min-height:   100vh;
-            padding:   20px;
-            overflow-x:   hidden;
+            background-size: cover;
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
         }
         
         .container {
-            max-width:   1400px;
-            margin:   0 auto;
+            max-width: 1400px;
+            margin: 0 auto;
         }
         
         header {
-            text-align:   center;
-            padding:   20px 0;
-            margin-bottom:   20px;
-            background:   rgba(0,   0,   0,   0.6);
-            border-radius:   15px;
-            box-shadow:   0 8px 32px rgba(0,   0,   0,   0.3);
-            backdrop-filter:   blur(10px);
-            border:   1px solid rgba(255,   255,   255,   0.18);
-            position:   relative;
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 20px;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            position: relative;
         }
         
         .logo-container {
-            display:   flex;
-            align-items:   center;
-            justify-content:   center;
-            gap:   15px;
-            margin-bottom:   10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 10px;
         }
         
         .logo {
-            width:   80px;
-            height:   80px;
-            background:   linear-gradient(45deg,   #ffd700,   #ff8c00);
-            border-radius:   50%;
-            display:   flex;
-            align-items:   center;
-            justify-content:   center;
-            box-shadow:   0 0 20px rgba(255,   215,   0,   0.5);
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(45deg, #ffd700, #ff8c00);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
         }
         
         .logo i {
-            font-size:   40px;
-            color:   #8b0000;
+            font-size: 40px;
+            color: #8b0000;
         }
         
         h1 {
-            font-size:   2.8rem;
-            text-shadow:   0 2px 4px rgba(0,   0,   0,   0.5);
-            margin-bottom:   5px;
+            font-size: 2.8rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            margin-bottom: 5px;
         }
         
         .subtitle {
-            font-size:   1.2rem;
-            opacity:   0.9;
-            max-width:   600px;
-            margin:   0 auto 20px;
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto 20px;
         }
         
         .auth-section {
-            background:   rgba(255,   255,   255,   0.1);
-            border-radius:   15px;
-            padding:   25px;
-            margin:   20px 0;
-            box-shadow:   0 8px 32px rgba(0,   0,   0,   0.3);
-            backdrop-filter:   blur(10px);
-            border:   1px solid rgba(255,   255,   255,   0.18);
-            text-align:   center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            text-align: center;
         }
         
         .auth-section h2 {
-            color:   #ffd700;
-            margin-bottom:   20px;
+            color: #ffd700;
+            margin-bottom: 20px;
         }
         
         .form-group {
-            margin-bottom:   20px;
-            text-align:   left;
+            margin-bottom: 20px;
+            text-align: left;
         }
         
         .form-group label {
-            display:   block;
-            margin-bottom:   8px;
-            font-weight:   bold;
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
         }
         
-        .form-group input,   
-        .form-group select,   
+        .form-group input, 
+        .form-group select, 
         .form-group textarea {
-            width:   100%;
-            padding:   12px;
-            border-radius:   8px;
-            border:   1px solid rgba(255,   255,   255,   0.3);
-            background:   rgba(0,   0,   0,   0.3);
-            color:   white;
-            font-size:   1rem;
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            font-size: 1rem;
         }
         
         .btn {
-            padding:   12px 25px;
-            border-radius:   30px;
-            border:   none;
-            background:   #ffd700;
-            color:   #000;
-            font-weight:   bold;
-            cursor:   pointer;
-            transition:   all 0.3s ease;
-            display:   inline-flex;
-            align-items:   center;
-            gap:   8px;
+            padding: 12px 25px;
+            border-radius: 30px;
+            border: none;
+            background: #ffd700;
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
         
-        .btn:  hover {
-            transform:   translateY(-3px);
-            box-shadow:   0 5px 15px rgba(0,   0,   0,   0.3);
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
         
         .btn i {
-            font-size:   1.2rem;
+            font-size: 1.2rem;
         }
         
         .btn-secondary {
-            background:   rgba(255,   255,   255,   0.1);
-            color:   white;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
         }
         
         .btn-danger {
-            background:   #ff4d4d;
-            color:   white;
+            background: #ff4d4d;
+            color: white;
         }
         
         .btn-success {
-            background:   #4dff4d;
-            color:   #000;
+            background: #4dff4d;
+            color: #000;
         }
         
         .btn-warning {
-            background:   #ff9900;
-            color:   #000;
+            background: #ff9900;
+            color: #000;
         }
         
         .btn-info {
-            background:   #17a2b8;
-            color:   white;
+            background: #17a2b8;
+            color: white;
         }
         
         .cameras-section {
-            display:   none;
+            display: none;
         }
         
         .section-title {
-            color:   #ffd700;
-            margin:   25px 0 15px;
-            display:   flex;
-            align-items:   center;
-            gap:   10px;
+            color: #ffd700;
+            margin: 25px 0 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
         .camera-grid {
-            display:   grid;
-            grid-template-columns:   repeat(auto-fill,   minmax(300px,   1fr));
-            gap:   20px;
-            margin-top:   20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
         }
         
         .camera-card {
-            background:   rgba(255,   255,   255,   0.1);
-            border-radius:   15px;
-            padding:   20px;
-            box-shadow:   0 8px 32px rgba(0,   0,   0,   0.3);
-            backdrop-filter:   blur(10px);
-            border:   1px solid rgba(255,   255,   255,   0.18);
-            transition:   transform 0.3s ease;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            transition: transform 0.3s ease;
         }
         
-        .camera-card:  hover {
-            transform:   translateY(-5px);
-            box-shadow:   0 12px 40px rgba(0,   0,   0,   0.4);
+        .camera-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
         }
         
         .camera-title {
-            font-size:   1.2rem;
-            margin-bottom:   15px;
-            color:   #ffd700;
-            display:   flex;
-            align-items:   center;
-            gap:   10px;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: #ffd700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
         .camera-iframe {
-            width:   100%;
-            height:   180px;
-            border-radius:   8px;
-            border:   none;
-            margin:   10px 0;
-            background:   rgba(0,   0,   0,   0.3);
+            width: 100%;
+            height: 180px;
+            border-radius: 8px;
+            border: none;
+            margin: 10px 0;
+            background: rgba(0, 0, 0, 0.3);
         }
         
         .camera-details {
-            margin:   15px 0;
+            margin: 15px 0;
         }
         
         .camera-details p {
-            margin:   8px 0;
-            display:   flex;
-            gap:   10px;
+            margin: 8px 0;
+            display: flex;
+            gap: 10px;
         }
         
         .camera-details strong {
-            min-width:   100px;
-            display:   inline-block;
+            min-width: 100px;
+            display: inline-block;
         }
         
         .camera-actions {
-            display:   flex;
-            gap:   10px;
-            margin-top:   15px;
-            flex-wrap:   wrap;
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
         }
         
         .camera-actions .btn {
-            flex:   1;
-            min-width:   120px;
-            justify-content:   center;
+            flex: 1;
+            min-width: 120px;
+            justify-content: center;
         }
         
         .modal {
-            display:   none;
-            position:   fixed;
-            top:   0;
-            left:   0;
-            width:   100%;
-            height:   100%;
-            background:   rgba(0,   0,   0,   0.8);
-            z-index:   1000;
-            align-items:   center;
-            justify-content:   center;
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
         }
         
         .modal-content {
-            background:   rgba(0,   0,   0,   0.9);
-            border-radius:   15px;
-            padding:   30px;
-            width:   90%;
-            max-width:   600px;
-            box-shadow:   0 10px 30px rgba(0,   0,   0,   0.5);
-            border:   1px solid rgba(255,   255,   255,   0.18);
-            position:   relative;
-            max-height:   90vh;
-            overflow-y:   auto;
+            background: rgba(0, 0, 0, 0.9);
+            border-radius: 15px;
+            padding: 30px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
         }
         
         .close-modal {
-            position:   absolute;
-            top:   20px;
-            right:   20px;
-            font-size:   1.5rem;
-            cursor:   pointer;
-            color:   #ffd700;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #ffd700;
         }
         
         .modal h2 {
-            color:   #ffd700;
-            margin-bottom:   20px;
-            text-align:   center;
+            color: #ffd700;
+            margin-bottom: 20px;
+            text-align: center;
         }
         
         .form-row {
-            display:   flex;
-            gap:   15px;
-            margin-bottom:   20px;
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
         }
         
         .form-row .form-group {
-            flex:   1;
+            flex: 1;
         }
         
         .status-indicator {
-            display:   inline-block;
-            width:   12px;
-            height:   12px;
-            border-radius:   50%;
-            margin-right:   8px;
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
         }
         
         .status-connected {
-            background-color:   #4dff4d;
-            box-shadow:   0 0 8px #4dff4d;
+            background-color: #4dff4d;
+            box-shadow: 0 0 8px #4dff4d;
         }
         
         .status-disconnected {
-            background-color:   #ff4d4d;
+            background-color: #ff4d4d;
         }
         
         .notification {
-            position:   fixed;
-            top:   20px;
-            right:   20px;
-            padding:   15px 25px;
-            border-radius:   8px;
-            background:   rgba(0,   0,   0,   0.8);
-            border-left:   4px solid #4dff4d;
-            box-shadow:   0 5px 15px rgba(0,   0,   0,   0.3);
-            z-index:   2000;
-            display:   none;
-            animation:   slideIn 0.3s ease;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.8);
+            border-left: 4px solid #4dff4d;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            z-index: 2000;
+            display: none;
+            animation: slideIn 0.3s ease;
         }
         
         .notification.error {
-            border-left-color:   #ff4d4d;
+            border-left-color: #ff4d4d;
         }
         
         @keyframes slideIn {
-            from { transform:   translateX(100%); opacity:   0; }
-            to { transform:   translateX(0); opacity:   1; }
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
         
         footer {
-            text-align:   center;
-            padding:   20px;
-            margin-top:   30px;
-            font-size:   0.9rem;
-            opacity:   0.8;
-            background:   rgba(0,   0,   0,   0.6);
-            border-radius:   15px;
-            box-shadow:   0 8px 32px rgba(0,   0,   0,   0.3);
-            backdrop-filter:   blur(10px);
-            border:   1px solid rgba(255,   255,   255,   0.18);
+            text-align: center;
+            padding: 20px;
+            margin-top: 30px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
         }
         
-        @media (max-width:   768px) {
+        @media (max-width: 768px) {
             .form-row {
-                flex-direction:   column;
+                flex-direction: column;
             }
             
             .camera-grid {
-                grid-template-columns:   1fr;
+                grid-template-columns: 1fr;
             }
             
             h1 {
-                font-size:   2.2rem;
+                font-size: 2.2rem;
             }
         }
         
         /* Bulk Update Styles */
         .bulk-section {
-            background:   rgba(255,   255,   255,   0.1);
-            border-radius:   15px;
-            padding:   20px;
-            margin:   20px 0;
-            box-shadow:   0 8px 32px rgba(0,   0,   0,   0.3);
-            backdrop-filter:   blur(10px);
-            border:   1px solid rgba(255,   255,   255,   0.18);
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
         }
         
         .bulk-section h3 {
-            color:   #ffd700;
-            margin-bottom:   15px;
-            display:   flex;
-            align-items:   center;
-            gap:   10px;
+            color: #ffd700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
         .bulk-controls {
-            display:   flex;
-            gap:   15px;
-            margin-bottom:   20px;
-            flex-wrap:   wrap;
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
         }
         
         .bulk-controls .btn {
-            flex:   1;
-            min-width:   150px;
-            justify-content:   center;
+            flex: 1;
+            min-width: 150px;
+            justify-content: center;
         }
         
         .bulk-form {
-            display:   none;
-            background:   rgba(0,   0,   0,   0.3);
-            border-radius:   10px;
-            padding:   20px;
-            margin-top:   20px;
+            display: none;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
         }
         
         .bulk-form.active {
-            display:   block;
+            display: block;
         }
         
         .bulk-form .form-group {
-            margin-bottom:   15px;
+            margin-bottom: 15px;
         }
         
         .bulk-form .form-group label {
-            display:   block;
-            margin-bottom:   5px;
+            display: block;
+            margin-bottom: 5px;
         }
         
         .bulk-actions {
-            display:   flex;
-            gap:   10px;
-            margin-top:   15px;
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
         }
         
         .bulk-actions .btn {
-            flex:   1;
+            flex: 1;
         }
         
         .camera-selection {
-            display:   flex;
-            flex-wrap:   wrap;
-            gap:   10px;
-            margin-top:   10px;
-            max-height:   150px;
-            overflow-y:   auto;
-            padding:   10px;
-            background:   rgba(0,   0,   0,   0.2);
-            border-radius:   8px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+            max-height: 150px;
+            overflow-y: auto;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
         }
         
         .camera-selection-item {
-            background:   rgba(255,   215,   0,   0.2);
-            border:   1px solid rgba(255,   215,   0,   0.5);
-            border-radius:   5px;
-            padding:   5px 10px;
-            display:   flex;
-            align-items:   center;
-            gap:   5px;
-            font-size:   0.9rem;
+            background: rgba(255, 215, 0, 0.2);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            border-radius: 5px;
+            padding: 5px 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9rem;
         }
         
         .camera-selection-item .remove-btn {
-            background:   none;
-            border:   none;
-            color:   #ff4d4d;
-            cursor:   pointer;
-            font-size:   1rem;
+            background: none;
+            border: none;
+            color: #ff4d4d;
+            cursor: pointer;
+            font-size: 1rem;
         }
         
         .select-all-container {
-            display:   flex;
-            align-items:   center;
-            gap:   10px;
-            margin:   10px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
         }
         
         .select-all-container input {
-            width:   auto;
+            width: auto;
         }
         
         .progress-container {
-            margin-top:   15px;
-            display:   none;
+            margin-top: 15px;
+            display: none;
         }
         
         .progress-bar {
-            height:   10px;
-            background:   rgba(255,   255,   255,   0.1);
-            border-radius:   5px;
-            overflow:   hidden;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
         }
         
         .progress-fill {
-            height:   100%;
-            background:   #4dff4d;
-            width:   0%;
-            transition:   width 0.3s ease;
+            height: 100%;
+            background: #4dff4d;
+            width: 0%;
+            transition: width 0.3s ease;
         }
         
         .progress-text {
-            text-align:   center;
-            margin-top:   5px;
-            font-size:   0.9rem;
+            text-align: center;
+            margin-top: 5px;
+            font-size: 0.9rem;
         }
         
         .stats-container {
-            display:   flex;
-            gap:   20px;
-            margin:   20px 0;
-            flex-wrap:   wrap;
+            display: flex;
+            gap: 20px;
+            margin: 20px 0;
+            flex-wrap: wrap;
         }
         
         .stat-card {
-            background:   rgba(255,   255,   255,   0.1);
-            border-radius:   10px;
-            padding:   15px;
-            text-align:   center;
-            flex:   1;
-            min-width:   120px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            flex: 1;
+            min-width: 120px;
         }
         
         .stat-value {
-            font-size:   1.8rem;
-            font-weight:   bold;
-            color:   #ffd700;
-            margin:   10px 0;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #ffd700;
+            margin: 10px 0;
         }
         
         .stat-label {
-            font-size:   0.9rem;
-            opacity:   0.8;
+            font-size: 0.9rem;
+            opacity: 0.8;
         }
         
         /* Upload Section */
         .upload-section {
-            background:   rgba(255,   255,   255,   0.1);
-            border-radius:   15px;
-            padding:   20px;
-            margin:   20px 0;
-            box-shadow:   0 8px 32px rgba(0,   0,   0,   0.3);
-            backdrop-filter:   blur(10px);
-            border:   1px solid rgba(255,   255,   255,   0.18);
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
         }
         
         .upload-section h3 {
-            color:   #ffd700;
-            margin-bottom:   15px;
-            display:   flex;
-            align-items:   center;
-            gap:   10px;
+            color: #ffd700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
         .upload-form {
-            background:   rgba(0,   0,   0,   0.3);
-            border-radius:   10px;
-            padding:   20px;
-            margin-top:   20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
         }
         
         .file-upload {
-            border:   2px dashed rgba(255,   215,   0,   0.5);
-            border-radius:   10px;
-            padding:   30px;
-            text-align:   center;
-            margin-bottom:   20px;
-            cursor:   pointer;
-            transition:   all 0.3s ease;
+            border: 2px dashed rgba(255, 215, 0, 0.5);
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
         
-        .file-upload:  hover {
-            background:   rgba(255,   215,   0,   0.1);
-            border-color:   #ffd700;
+        .file-upload:hover {
+            background: rgba(255, 215, 0, 0.1);
+            border-color: #ffd700;
         }
         
         .file-upload i {
-            font-size:   3rem;
-            color:   #ffd700;
-            margin-bottom:   15px;
+            font-size: 3rem;
+            color: #ffd700;
+            margin-bottom: 15px;
         }
         
         .file-upload p {
-            margin:   10px 0;
+            margin: 10px 0;
         }
         
         .file-input {
-            display:   none;
+            display: none;
         }
         
         .file-info {
-            background:   rgba(0,   0,   0,   0.3);
-            border-radius:   8px;
-            padding:   15px;
-            margin-top:   15px;
-            display:   none;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            display: none;
         }
         
         .file-info.active {
-            display:   block;
+            display: block;
         }
         
         .preview-table {
-            width:   100%;
-            border-collapse:   collapse;
-            margin-top:   15px;
-            font-size:   0.9rem;
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 0.9rem;
         }
         
-        .preview-table th,   
+        .preview-table th, 
         .preview-table td {
-            border:   1px solid rgba(255,   255,   255,   0.2);
-            padding:   8px;
-            text-align:   left;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 8px;
+            text-align: left;
         }
         
         .preview-table th {
-            background:   rgba(255,   215,   0,   0.2);
+            background: rgba(255, 215, 0, 0.2);
         }
         
-        .preview-table tr:  nth-child(even) {
-            background:   rgba(255,   255,   255,   0.05);
+        .preview-table tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.05);
         }
         
         .upload-actions {
-            display:   flex;
-            gap:   10px;
-            margin-top:   15px;
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
         }
         
         .upload-actions .btn {
-            flex:   1;
+            flex: 1;
         }
         
         .upload-progress {
-            margin-top:   20px;
-            display:   none;
+            margin-top: 20px;
+            display: none;
         }
         
         .upload-progress.active {
-            display:   block;
+            display: block;
         }
         
         .upload-status {
-            margin-top:   10px;
-            text-align:   center;
-            font-weight:   bold;
+            margin-top: 10px;
+            text-align: center;
+            font-weight: bold;
         }
         
         .upload-status.processing {
-            color:   #ffd700;
+            color: #ffd700;
         }
         
         .upload-status.completed {
-            color:   #4dff4d;
+            color: #4dff4d;
         }
         
         .upload-status.error {
-            color:   #ff4d4d;
+            color: #ff4d4d;
         }
         
         .template-link {
-            display:   inline-block;
-            margin-top:   10px;
-            color:   #ffd700;
-            text-decoration:   none;
+            display: inline-block;
+            margin-top: 10px;
+            color: #ffd700;
+            text-decoration: none;
         }
         
-        .template-link:  hover {
-            text-decoration:   underline;
+        .template-link:hover {
+            text-decoration: underline;
         }
         
         .tabs {
-            display:   flex;
-            gap:   10px;
-            margin-bottom:   20px;
-            border-bottom:   1px solid rgba(255,   255,   255,   0.2);
-            padding-bottom:   10px;
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 10px;
         }
         
         .tab {
-            padding:   10px 20px;
-            border-radius:   30px;
-            cursor:   pointer;
-            background:   rgba(255,   255,   255,   0.1);
-            transition:   all 0.3s ease;
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
         }
         
         .tab.active {
-            background:   #ffd700;
-            color:   #000;
-            font-weight:   bold;
+            background: #ffd700;
+            color: #000;
+            font-weight: bold;
         }
         
         .tab-content {
-            display:   none;
+            display: none;
         }
         
         .tab-content.active {
-            display:   block;
+            display: block;
         }
         
         .error-message {
-            color:   #ff4d4d;
-            font-size:   0.9rem;
-            margin-top:   5px;
-            display:   none;
+            color: #ff4d4d;
+            font-size: 0.9rem;
+            margin-top: 5px;
+            display: none;
         }
         
         .error-message.show {
-            display:   block;
+            display: block;
+        }
+        
+        .column-info {
+            background: rgba(255, 215, 0, 0.1);
+            border-left: 3px solid #ffd700;
+            padding: 10px;
+            margin: 15px 0;
+            border-radius: 0 5px 5px 0;
         }
     </style>
 </head>
@@ -729,13 +737,13 @@
             <button class="btn" id="loginBtn">
                 <i class="fas fa-sign-in-alt"></i> Login
             </button>
-            <p style="margin-top:   15px; color:   #ffd700;">
+            <p style="margin-top: 15px; color: #ffd700;">
                 <i class="fas fa-info-circle"></i> Go away and get lost if you're not a staff
             </p>
         </div>
         
         <div class="cameras-section" id="camerasSection">
-            <div style="display:   flex; justify-content:   space-between; align-items:   center;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
                 <h2 class="section-title"><i class="fas fa-video"></i> Live Camera Management</h2>
                 <div>
                     <span class="status-indicator" id="statusIndicator"></span>
@@ -743,7 +751,7 @@
                 </div>
             </div>
             
-            <div style="display:   flex; gap:   15px; margin:   20px 0; flex-wrap:   wrap;">
+            <div style="display: flex; gap: 15px; margin: 20px 0; flex-wrap: wrap;">
                 <button class="btn" id="addCameraBtn">
                     <i class="fas fa-plus"></i> Add New Camera
                 </button>
@@ -845,7 +853,12 @@
             <div class="tab-content" id="bulkUploadTab">
                 <div class="upload-section">
                     <h3><i class="fas fa-upload"></i> Bulk Upload Cameras</h3>
-                    <p>Upload a CSV file to add multiple cameras at once. Format: Camera ID, English Title, Chinese Title, Portuguese Title, Japanese Title, Embed URL, Location</p>
+                    <p>Upload a CSV file with 5 columns: English Title, Chinese Title, Portuguese Title, Japanese Title, Embed URL</p>
+                    
+                    <div class="column-info">
+                        <strong>Required Format:</strong> English Title, Chinese Title, Portuguese Title, Japanese Title, Embed URL
+                    </div>
+                    
                     <a href="#" class="template-link" id="downloadTemplate">
                         <i class="fas fa-download"></i> Download CSV Template
                     </a>
@@ -863,21 +876,19 @@
                         
                         <div class="file-info" id="fileInfo">
                             <h4>File Information</h4>
-                            <p><strong>File Name:  </strong> <span id="fileName">-</span></p>
-                            <p><strong>Size:  </strong> <span id="fileSize">-</span></p>
+                            <p><strong>File Name:</strong> <span id="fileName">-</span></p>
+                            <p><strong>Size:</strong> <span id="fileSize">-</span></p>
                             
                             <div class="preview-table-container">
-                                <h4>Preview</h4>
+                                <h4>Preview (5 columns)</h4>
                                 <table class="preview-table" id="previewTable">
                                     <thead>
                                         <tr>
-                                            <th>Camera ID</th>
                                             <th>English Title</th>
                                             <th>Chinese Title</th>
                                             <th>Portuguese Title</th>
                                             <th>Japanese Title</th>
                                             <th>Embed URL</th>
-                                            <th>Location</th>
                                         </tr>
                                     </thead>
                                     <tbody id="previewTableBody">
@@ -919,7 +930,7 @@
                 
                 <div class="form-group">
                     <label for="cameraId">Camera ID</label>
-                    <input type="text" id="cameraId" placeholder="Unique identifier (e.g.,   camera-001)">
+                    <input type="text" id="cameraId" placeholder="Unique identifier (e.g., camera-001)">
                 </div>
                 
                 <div class="form-row">
@@ -946,7 +957,7 @@
                 
                 <div class="form-group">
                     <label for="embedUrl">Embed URL</label>
-                    <input type="text" id="embedUrl" placeholder="Live stream URL (e.g.,   https://...)">
+                    <input type="text" id="embedUrl" placeholder="Live stream URL (e.g., https://...)">
                 </div>
                 
                 <div class="form-group">
@@ -959,7 +970,7 @@
                     </select>
                 </div>
                 
-                <div style="display:   flex; gap:   15px; margin-top:   25px;">
+                <div style="display: flex; gap: 15px; margin-top: 25px;">
                     <button class="btn" id="saveCameraBtn">
                         <i class="fas fa-save"></i> Save Camera
                     </button>
@@ -976,20 +987,20 @@
         
         <footer>
             <p>Macau Traffic Monitor Staff Panel © 2026</p>
-            <p>Data Source:   Firebase Realtime Database</p>
+            <p>Data Source: Firebase Realtime Database</p>
         </footer>
     </div>
 
     <script>
         // Firebase configuration
         const firebaseConfig = {
-            apiKey:   "AIzaSyB1_sJvG1u47J3K0K0K0K0K0K0K0K0K0K0",    
-            authDomain:   "macau-traffic-501cb.firebaseapp.com",    
-            databaseURL:   "https://macau-traffic-501cb-default-rtdb.firebaseio.com",    
-            projectId:   "macau-traffic-501cb",    
-            storageBucket:   "macau-traffic-501cb.appspot.com",    
-            messagingSenderId:   "123456789012",    
-            appId:   "1:  123456789012:  web:  abcdef1234567890abcdef"
+            apiKey: "AIzaSyB1_sJvG1u47J3K0K0K0K0K0K0K0K0K0K0", 
+            authDomain: "macau-traffic-501cb.firebaseapp.com", 
+            databaseURL: "https://macau-traffic-501cb-default-rtdb.firebaseio.com", 
+            projectId: "macau-traffic-501cb", 
+            storageBucket: "macau-traffic-501cb.appspot.com", 
+            messagingSenderId: "123456789012", 
+            appId: "1:123456789012:web:abcdef1234567890abcdef"
         };
 
         // Initialize Firebase
@@ -1093,7 +1104,7 @@
         }
 
         // Show notification
-        function showNotification(message,   isError = false) {
+        function showNotification(message, isError = false) {
             const notificationMessage = document.getElementById('notificationMessage');
             notificationMessage.textContent = message;
             
@@ -1107,7 +1118,7 @@
             
             setTimeout(() => {
                 notification.style.display = 'none';
-            },   3000);
+            }, 3000);
         }
 
         // Login function
@@ -1147,7 +1158,7 @@
 
         // Load cameras from Firebase
         function loadCameras() {
-            cameraGrid.innerHTML = '<p style="text-align:   center; width:   100%;"><i class="fas fa-spinner fa-spin"></i> Loading cameras...</p>';
+            cameraGrid.innerHTML = '<p style="text-align: center; width: 100%;"><i class="fas fa-spinner fa-spin"></i> Loading cameras...</p>';
             
             const camerasRef = database.ref('cameras');
             camerasRef.once('value')
@@ -1158,15 +1169,15 @@
                         displayCameras(cameras);
                         updateStats();
                     } else {
-                        cameraGrid.innerHTML = '<p style="text-align:   center; width:   100%;">No cameras found</p>';
+                        cameraGrid.innerHTML = '<p style="text-align: center; width: 100%;">No cameras found</p>';
                         allCameras = {};
                         updateStats();
                     }
                 })
                 .catch((error) => {
-                    console.error('Error loading cameras:   ',   error);
-                    cameraGrid.innerHTML = '<p style="text-align:   center; width:   100%; color:   #ff4d4d;">Error loading cameras. Please try again.</p>';
-                    showNotification('Failed to load cameras',   true);
+                    console.error('Error loading cameras: ', error);
+                    cameraGrid.innerHTML = '<p style="text-align: center; width: 100%; color: #ff4d4d;">Error loading cameras. Please try again.</p>';
+                    showNotification('Failed to load cameras', true);
                 });
         }
 
@@ -1190,9 +1201,9 @@
                         <i class="fas fa-video"></i> ${camera.titles.en}
                     </div>
                     <div class="camera-details">
-                        <p><strong>ID:   </strong> ${cameraId}</p>
-                        <p><strong>Location:   </strong> ${camera.location}</p>
-                        <p><strong>URL:   </strong> ${camera.embedUrl}</p>
+                        <p><strong>ID:</strong> ${cameraId}</p>
+                        <p><strong>Location:</strong> ${camera.location}</p>
+                        <p><strong>URL:</strong> ${camera.embedUrl}</p>
                     </div>
                     <iframe class="camera-iframe" src="${camera.embedUrl}" allowfullscreen></iframe>
                     <div class="camera-actions">
@@ -1212,16 +1223,16 @@
             
             // Add event listeners to edit and delete buttons
             document.querySelectorAll('.edit-btn').forEach(btn => {
-                btn.addEventListener('click',   () => editCamera(btn.dataset.id));
+                btn.addEventListener('click', () => editCamera(btn.dataset.id));
             });
             
             document.querySelectorAll('.delete-btn').forEach(btn => {
-                btn.addEventListener('click',   () => deleteCamera(btn.dataset.id));
+                btn.addEventListener('click', () => deleteCamera(btn.dataset.id));
             });
             
             // Add event listeners to select buttons
             document.querySelectorAll('.select-btn').forEach(btn => {
-                btn.addEventListener('click',   () => toggleCameraSelection(btn.dataset.id));
+                btn.addEventListener('click', () => toggleCameraSelection(btn.dataset.id));
             });
         }
 
@@ -1231,7 +1242,7 @@
             if (index === -1) {
                 selectedCameras.push(cameraId);
             } else {
-                selectedCameras.splice(index,   1);
+                selectedCameras.splice(index, 1);
             }
             updateCameraSelectionDisplay();
             updateStats();
@@ -1263,11 +1274,11 @@
             
             // Add event listeners to remove buttons
             document.querySelectorAll('.remove-btn').forEach(btn => {
-                btn.addEventListener('click',   () => {
+                btn.addEventListener('click', () => {
                     const cameraId = btn.dataset.id;
                     const index = selectedCameras.indexOf(cameraId);
                     if (index !== -1) {
-                        selectedCameras.splice(index,   1);
+                        selectedCameras.splice(index, 1);
                         updateCameraSelectionDisplay();
                         updateStats();
                     }
@@ -1292,7 +1303,7 @@
         // Open bulk update form
         function openBulkUpdateForm() {
             if (selectedCameras.length === 0) {
-                showNotification('Please select at least one camera',   true);
+                showNotification('Please select at least one camera', true);
                 return;
             }
             bulkUpdateForm.classList.add('active');
@@ -1304,7 +1315,7 @@
             const embedUrl = bulkEmbedUrlInput.value.trim();
             
             if (!location && !embedUrl) {
-                showNotification('Please specify at least one property to update',   true);
+                showNotification('Please specify at least one property to update', true);
                 return;
             }
             
@@ -1362,8 +1373,8 @@
                 
                 showNotification(`Successfully updated ${total} cameras!`);
             } catch (error) {
-                console.error('Error during bulk update:   ',   error);
-                showNotification('Failed to update cameras',   true);
+                console.error('Error during bulk update: ', error);
+                showNotification('Failed to update cameras', true);
             } finally {
                 // Re-enable buttons
                 applyBulkUpdateBtn.disabled = false;
@@ -1372,7 +1383,7 @@
                 // Hide progress after delay
                 setTimeout(() => {
                     progressContainer.style.display = 'none';
-                },   2000);
+                }, 2000);
             }
         }
 
@@ -1410,12 +1421,12 @@
                         locationSelect.value = camera.location;
                         cameraModal.style.display = 'flex';
                     } else {
-                        showNotification('Camera not found',   true);
+                        showNotification('Camera not found', true);
                     }
                 })
                 .catch((error) => {
-                    console.error('Error loading camera:   ',   error);
-                    showNotification('Failed to load camera data',   true);
+                    console.error('Error loading camera: ', error);
+                    showNotification('Failed to load camera data', true);
                 });
         }
 
@@ -1430,31 +1441,31 @@
             const location = locationSelect.value;
             
             if (!cameraId || !englishTitle || !embedUrl) {
-                showNotification('Please fill in all required fields',   true);
+                showNotification('Please fill in all required fields', true);
                 return;
             }
             
             const cameraData = {
-                titles:   {
-                    en:   englishTitle,   
-                    zh:   chineseTitle || '',   
-                    pt:   portugueseTitle || '',   
-                    ja:   japaneseTitle || ''
-                },   
-                embedUrl:   embedUrl,   
-                location:   location
+                titles: {
+                    en: englishTitle, 
+                    zh: chineseTitle || '', 
+                    pt: portugueseTitle || '', 
+                    ja: japaneseTitle || ''
+                }, 
+                embedUrl: embedUrl, 
+                location: location
             };
             
             const camerasRef = database.ref('cameras/' + cameraId);
             camerasRef.set(cameraData)
                 .then(() => {
-                    showNotification(`Camera ${currentEditingCameraId ? 'updated' :   'added'} successfully!`);
+                    showNotification(`Camera ${currentEditingCameraId ? 'updated' : 'added'} successfully!`);
                     cameraModal.style.display = 'none';
                     loadCameras();
                 })
                 .catch((error) => {
-                    console.error('Error saving camera:   ',   error);
-                    showNotification('Failed to save camera',   true);
+                    console.error('Error saving camera: ', error);
+                    showNotification('Failed to save camera', true);
                 });
         }
 
@@ -1468,8 +1479,8 @@
                         loadCameras();
                     })
                     .catch((error) => {
-                        console.error('Error deleting camera:   ',   error);
-                        showNotification('Failed to delete camera',   true);
+                        console.error('Error deleting camera: ', error);
+                        showNotification('Failed to delete camera', true);
                     });
             }
         }
@@ -1509,24 +1520,26 @@
         function formatFileSize(bytes) {
             if (bytes === 0) return '0 Bytes';
             const k = 1024;
-            const sizes = ['Bytes',   'KB',   'MB',   'GB'];
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
             const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k,   i)).toFixed(2)) + ' ' + sizes[i];
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
 
-        // Parse CSV content
+        // Parse CSV content (5 columns: English, Chinese, Portuguese, Japanese, Embed URL)
         function parseCSV(content) {
             const lines = content.split('\n');
-            const headers = lines[0].split(',').map(h => h.trim().replace(/"/g,  ''));
             
             // Clear previous data
             csvData = [];
             previewTableBody.innerHTML = '';
             
             // Process each line
-            for (let i = 1; i < lines.length; i++) {
+            for (let i = 0; i < lines.length; i++) {
                 const line = lines[i].trim();
                 if (!line) continue;
+                
+                // Skip header row
+                if (i === 0 && line.toLowerCase().includes('english')) continue;
                 
                 // Split by comma but handle quoted values
                 const values = [];
@@ -1547,42 +1560,57 @@
                 }
                 values.push(current.trim());
                 
-                if (values.length < 7) continue;
+                // Must have exactly 5 columns
+                if (values.length !== 5) {
+                    showNotification(`Line ${i+1} has ${values.length} columns, expected 5`, true);
+                    continue;
+                }
                 
                 const cameraData = {
-                    id:  values[0], 
-                    en:  values[1], 
-                    zh:  values[2] || '', 
-                    pt:  values[3] || '', 
-                    ja:  values[4] || '', 
-                    embedUrl:  values[5], 
-                    location:  values[6]
+                    en: values[0], 
+                    zh: values[1] || '', 
+                    pt: values[2] || '', 
+                    ja: values[3] || '', 
+                    embedUrl: values[4]
                 };
+                
+                // Validate required fields
+                if (!cameraData.en) {
+                    showNotification(`Line ${i+1}: Missing English title`, true);
+                    continue;
+                }
+                
+                if (!cameraData.embedUrl || !cameraData.embedUrl.startsWith('http')) {
+                    showNotification(`Line ${i+1}: Invalid embed URL`, true);
+                    continue;
+                }
                 
                 csvData.push(cameraData);
                 
                 // Add to preview table
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${cameraData.id}</td>
                     <td>${cameraData.en}</td>
-                    <td>${cameraData.zh}</td>
-                    <td>${cameraData.pt}</td>
-                    <td>${cameraData.ja}</td>
+                    <td>${cameraData.zh || '-'}</td>
+                    <td>${cameraData.pt || '-'}</td>
+                    <td>${cameraData.ja || '-'}</td>
                     <td>${cameraData.embedUrl}</td>
-                    <td>${cameraData.location}</td>
                 `;
                 previewTableBody.appendChild(row);
             }
             
             // Enable upload button if we have data
             uploadBtn.disabled = csvData.length === 0;
+            
+            if (csvData.length > 0) {
+                showNotification(`Parsed ${csvData.length} cameras from CSV`);
+            }
         }
 
         // Upload cameras from CSV
         async function uploadCameras() {
             if (csvData.length === 0) {
-                showNotification('No camera data to upload',   true);
+                showNotification('No camera data to upload', true);
                 return;
             }
             
@@ -1603,19 +1631,22 @@
                 
                 // Upload each camera
                 for (const camera of csvData) {
+                    // Generate a unique camera ID
+                    const cameraId = 'camera-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
+                    
                     const cameraData = {
-                        titles:   {
-                            en:   camera.en, 
-                            zh:   camera.zh, 
-                            pt:   camera.pt, 
-                            ja:   camera.ja
+                        titles: {
+                            en: camera.en, 
+                            zh: camera.zh, 
+                            pt: camera.pt, 
+                            ja: camera.ja
                         }, 
-                        embedUrl:   camera.embedUrl, 
-                        location:   camera.location
+                        embedUrl: camera.embedUrl, 
+                        location: 'macau-city' // Default location
                     };
                     
                     // Save to Firebase
-                    await database.ref('cameras/' + camera.id).set(cameraData);
+                    await database.ref('cameras/' + cameraId).set(cameraData);
                     
                     // Update progress
                     completed++;
@@ -1636,10 +1667,10 @@
                 
                 showNotification(`Successfully uploaded ${total} cameras!`);
             } catch (error) {
-                console.error('Error during upload:   ',   error);
+                console.error('Error during upload: ', error);
                 uploadStatus.textContent = 'Upload failed. Please try again.';
                 uploadStatus.className = 'upload-status error';
-                showNotification('Failed to upload cameras',   true);
+                showNotification('Failed to upload cameras', true);
             } finally {
                 // Re-enable buttons
                 uploadBtn.disabled = false;
@@ -1648,7 +1679,7 @@
                 // Hide progress after delay
                 setTimeout(() => {
                     uploadProgress.classList.remove('active');
-                },   3000);
+                }, 3000);
             }
         }
 
@@ -1661,18 +1692,18 @@
             uploadBtn.disabled = true;
         }
 
-        // Download CSV template
+        // Download CSV template (5 columns)
         function downloadCSVTemplate() {
-            const csvContent = "Camera ID,English Title,Chinese Title,Portuguese Title,Japanese Title,Embed URL,Location\n" +
-                              "camera-001,Camera 1,,,https://example.com/camera1,macau-city\n" +
-                              "camera-002,Camera 2,,,https://example.com/camera2,taipa\n" +
-                              "camera-003,Camera 3,,,https://example.com/camera3,border";
+            const csvContent = "English Title,Chinese Title,Portuguese Title,Japanese Title,Embed URL\n" +
+                              "Main Street Camera,,Câmara da Rua Principal,,https://example.com/camera1\n" +
+                              "Harbour View Camera,,Vista do Porto,,https://example.com/camera2\n" +
+                              "Bridge Approach Camera,,Câmara de Aproximação da Ponte,,https://example.com/camera3";
             
-            const blob = new Blob([csvContent],   { type:  'text/csv;charset=utf-8;' });
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
-            link.setAttribute('href',   url);
-            link.setAttribute('download',   'camera_template.csv');
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'camera_template.csv');
             link.style.visibility = 'hidden';
             document.body.appendChild(link);
             link.click();
@@ -1699,39 +1730,39 @@
         }
 
         // Event Listeners
-        loginBtn.addEventListener('click',   login);
-        addCameraBtn.addEventListener('click',   openAddCameraModal);
-        refreshBtn.addEventListener('click',   loadCameras);
-        logoutBtn.addEventListener('click',   logout);
-        saveCameraBtn.addEventListener('click',   saveCamera);
-        cancelBtn.addEventListener('click',   closeCameraModal);
-        closeModal.addEventListener('click',   closeCameraModal);
-        bulkUpdateBtn.addEventListener('click',   () => switchTab('bulk-update'));
-        bulkUploadBtn.addEventListener('click',   () => switchTab('bulk-upload'));
-        selectAllBtn.addEventListener('click',   selectAllCameras);
-        deselectAllBtn.addEventListener('click',   deselectAllCameras);
-        openBulkFormBtn.addEventListener('click',   openBulkUpdateForm);
-        applyBulkUpdateBtn.addEventListener('click',   applyBulkUpdate);
-        cancelBulkUpdateBtn.addEventListener('click',   cancelBulkUpdate);
+        loginBtn.addEventListener('click', login);
+        addCameraBtn.addEventListener('click', openAddCameraModal);
+        refreshBtn.addEventListener('click', loadCameras);
+        logoutBtn.addEventListener('click', logout);
+        saveCameraBtn.addEventListener('click', saveCamera);
+        cancelBtn.addEventListener('click', closeCameraModal);
+        closeModal.addEventListener('click', closeCameraModal);
+        bulkUpdateBtn.addEventListener('click', () => switchTab('bulk-update'));
+        bulkUploadBtn.addEventListener('click', () => switchTab('bulk-upload'));
+        selectAllBtn.addEventListener('click', selectAllCameras);
+        deselectAllBtn.addEventListener('click', deselectAllCameras);
+        openBulkFormBtn.addEventListener('click', openBulkUpdateForm);
+        applyBulkUpdateBtn.addEventListener('click', applyBulkUpdate);
+        cancelBulkUpdateBtn.addEventListener('click', cancelBulkUpdate);
         
         // File upload events
-        browseFileBtn.addEventListener('click',   () => fileInput.click());
-        fileInput.addEventListener('change',   (e) => {
+        browseFileBtn.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => {
             if (e.target.files.length > 0) {
                 handleFileUpload(e.target.files[0]);
             }
         });
         
-        fileUploadArea.addEventListener('dragover',   (e) => {
+        fileUploadArea.addEventListener('dragover', (e) => {
             e.preventDefault();
-            fileUploadArea.style.backgroundColor = 'rgba(255,   215,   0,   0.2)';
+            fileUploadArea.style.backgroundColor = 'rgba(255, 215, 0, 0.2)';
         });
         
-        fileUploadArea.addEventListener('dragleave',   () => {
+        fileUploadArea.addEventListener('dragleave', () => {
             fileUploadArea.style.backgroundColor = '';
         });
         
-        fileUploadArea.addEventListener('drop',   (e) => {
+        fileUploadArea.addEventListener('drop', (e) => {
             e.preventDefault();
             fileUploadArea.style.backgroundColor = '';
             if (e.dataTransfer.files.length > 0) {
@@ -1739,22 +1770,22 @@
             }
         });
         
-        uploadBtn.addEventListener('click',   uploadCameras);
-        resetUploadBtn.addEventListener('click',   resetUploadForm);
-        downloadTemplate.addEventListener('click',   (e) => {
+        uploadBtn.addEventListener('click', uploadCameras);
+        resetUploadBtn.addEventListener('click', resetUploadForm);
+        downloadTemplate.addEventListener('click', (e) => {
             e.preventDefault();
             downloadCSVTemplate();
         });
         
         // Tab switching
         tabs.forEach(tab => {
-            tab.addEventListener('click',   () => {
+            tab.addEventListener('click', () => {
                 switchTab(tab.dataset.tab);
             });
         });
         
         // Close modal when clicking outside
-        window.addEventListener('click',   (e) => {
+        window.addEventListener('click', (e) => {
             if (e.target === cameraModal) {
                 closeCameraModal();
             }
