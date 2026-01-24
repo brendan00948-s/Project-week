@@ -23,7 +23,7 @@
         .form-group label{display: block;margin-bottom: 8px;font-weight: bold}
         .form-group input, .form-group select, .form-group textarea{width: 100%;padding: 12px;border-radius: 8px;border: 1px solid rgba(255, 255, 255, .3);background: rgba(0, 0, 0, .3);color: #fff;font-size: 1rem}
         .btn{padding: 12px 25px;border-radius: 30px;border: none;background: #ffd700;color: #000;font-weight: bold;cursor: pointer;transition: all .3s ease;display: inline-flex;align-items: center;gap: 8px}
-        .btn: hover{transform: translateY(-3px);box-shadow: 0 5px 15px rgba(0, 0, 0, .3)}
+        .btn:hover{transform: translateY(-3px);box-shadow: 0 5px 15px rgba(0, 0, 0, .3)}
         .btn i{font-size: 1.2rem}
         .btn-secondary{background: rgba(255, 255, 255, .1);color: #fff}
         .btn-danger{background: #ff4d4d;color: #fff}
@@ -34,7 +34,7 @@
         .section-title{color: #ffd700;margin: 25px 0 15px;display: flex;align-items: center;gap: 10px}
         .camera-grid, .news-grid{display: grid;grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));gap: 20px;margin-top: 20px}
         .camera-card, .news-card{background: rgba(255, 255, 255, .1);border-radius: 15px;padding: 20px;box-shadow: 0 8px 32px rgba(0, 0, 0, .3);backdrop-filter: blur(10px);border: 1px solid rgba(255, 255, 255, .18);transition: transform .3s ease;cursor: move}
-        .camera-card: hover, .news-card: hover{transform: translateY(-5px);box-shadow: 0 12px 40px rgba(0, 0, 0, .4)}
+        .camera-card:hover, .news-card:hover{transform: translateY(-5px);box-shadow: 0 12px 40px rgba(0, 0, 0, .4)}
         .camera-card.dragging, .news-card.dragging{opacity: .5;transform: scale(.98)}
         .camera-title, .news-title{font-size: 1.2rem;margin-bottom: 15px;color: #ffd700;display: flex;align-items: center;gap: 10px}
         .camera-iframe{width: 100%;height: 180px;border-radius: 8px;border: none;margin: 10px 0;background: rgba(0, 0, 0, .3)}
@@ -68,7 +68,7 @@
         .position-warning{color: #ff9900;font-size: .9rem;margin-top: 5px}
         .suggestion-list{position: absolute;background: rgba(0, 0, 0, .9);border: 1px solid rgba(255, 255, 255, .3);border-radius: 8px;max-height: 200px;overflow-y: auto;width: 100%;z-index: 100;display: none}
         .suggestion-item{padding: 10px;cursor: pointer}
-        .suggestion-item: hover{background: rgba(255, 215, 0, .2)}
+        .suggestion-item:hover{background: rgba(255, 215, 0, .2)}
         .drag-over{border: 2px dashed #ffd700;background: rgba(255, 215, 0, .1)}
         .drag-handle{cursor: move;padding: 5px;margin-right: 10px;color: #ffd700}
         .tabs{display: flex;gap: 10px;margin: 20px 0;flex-wrap: wrap}
@@ -141,10 +141,10 @@
             <div class="modal-content">
                 <span class="close-modal" id="closeModal">×</span>
                 <h2 id="modalTitle">Add New Camera</h2>
-                <div class="form-group"><label for="cameraId">Camera ID</label><div style="position: relative"><input type="text" id="cameraId" placeholder="Unique identifier (e.g.,  camera-001)"><div class="suggestion-list" id="suggestionList"></div></div></div>
+                <div class="form-group"><label for="cameraId">Camera ID</label><div style="position: relative"><input type="text" id="cameraId" placeholder="Unique identifier (e.g., camera-001)"><div class="suggestion-list" id="suggestionList"></div></div></div>
                 <div class="form-row"><div class="form-group"><label for="englishTitle">English Title</label><input type="text" id="englishTitle" placeholder="Camera title in English"></div><div class="form-group"><label for="chineseTitle">Chinese Title</label><input type="text" id="chineseTitle" placeholder="Camera title in Chinese"></div></div>
                 <div class="form-row"><div class="form-group"><label for="portugueseTitle">Portuguese Title</label><input type="text" id="portugueseTitle" placeholder="Camera title in Portuguese"></div><div class="form-group"><label for="japaneseTitle">Japanese Title</label><input type="text" id="japaneseTitle" placeholder="Camera title in Japanese"></div></div>
-                <div class="form-group"><label for="embedUrl">Embed URL</label><input type="text" id="embedUrl" placeholder="Live stream URL (e.g.,  https: //...)"></div>
+                <div class="form-group"><label for="embedUrl">Embed URL</label><input type="text" id="embedUrl" placeholder="Live stream URL (e.g., https://...)"></div>
                 <div class="form-group"><label for="location">Location</label><select id="location" class="form-control"><option value="macau-city">Macau City</option><option value="taipa">Taipa</option><option value="bridges">Cross-Sea Bridges</option><option value="border">Border Crossings</option></select></div>
                 <div class="form-group"><label for="position">Position</label><div class="position-container"><input type="number" id="position" class="position-input" min="1" placeholder="Position number"><span id="positionExample" style="opacity: .7">e.g. Macau City - 1</span></div><div id="positionWarning" class="position-warning" style="display: none"></div></div>
                 <div style="display: flex;gap: 15px;margin-top: 25px"><button class="btn" id="saveCameraBtn"><i class="fas fa-save"></i> Save Camera</button><button class="btn btn-secondary" id="cancelBtn"><i class="fas fa-times"></i> Cancel</button></div>
@@ -158,7 +158,7 @@
                 
                 <div class="form-group">
                     <label for="newsId">News ID</label>
-                    <input type="text" id="newsId" placeholder="Unique identifier (e.g.,  news-001)">
+                    <input type="text" id="newsId" placeholder="Unique identifier (e.g., news-001)">
                 </div>
                 
                 <div class="form-group">
@@ -184,12 +184,11 @@
                     </div>
                     
                     <div class="form-group">
-                        <label for="newsPriority">Priority</label>
-                        <select id="newsPriority">
-                            <option value="low">Low</option>
-                            <option value="medium">Medium</option>
-                            <option value="high">High</option>
-                            <option value="urgent">Urgent</option>
+                        <label for="newsRow">Row</label>
+                        <select id="newsRow">
+                            <option value="1">Row 1</option>
+                            <option value="2">Row 2</option>
+                            <option value="3">Row 3</option>
                         </select>
                     </div>
                 </div>
@@ -208,18 +207,18 @@
         </div>
 
         <div class="notification" id="notification"><p id="notificationMessage">Operation completed successfully!</p></div>
-        <footer><p>Macau Traffic Monitor Staff Panel © 2026</p><p>Data Source:  Firebase Realtime Database</p></footer>
+        <footer><p>Macau Traffic Monitor Staff Panel © 2026</p><p>Data Source: Firebase Realtime Database</p></footer>
     </div>
 
     <script>
         const firebaseConfig={
-            apiKey: "AIzaSyB1_sJvG1u47J3K0K0K0K0K0K0K0K0K0K0", 
-            authDomain: "macau-traffic-501cb.firebaseapp.com", 
-            databaseURL: "https://macau-traffic-501cb-default-rtdb.firebaseio.com", 
-            projectId: "macau-traffic-501cb", 
-            storageBucket: "macau-traffic-501cb.appspot.com", 
-            messagingSenderId: "123456789012", 
-            appId: "1: 123456789012: web: abcdef1234567890abcdef"
+            apiKey: "AIzaSyB1_sJvG1u47J3K0K0K0K0K0K0K0K0K0K0",  
+            authDomain: "macau-traffic-501cb.firebaseapp.com",  
+            databaseURL: "https://macau-traffic-501cb-default-rtdb.firebaseio.com",  
+            projectId: "macau-traffic-501cb",  
+            storageBucket: "macau-traffic-501cb.appspot.com",  
+            messagingSenderId: "123456789012",  
+            appId: "1:123456789012:web:abcdef1234567890abcdef"
         };
         firebase.initializeApp(firebaseConfig);
         const database=firebase.database();
@@ -278,7 +277,7 @@
         const newsTitleInput=document.getElementById('newsTitle');
         const newsContentInput=document.getElementById('newsContent');
         const newsCategorySelect=document.getElementById('newsCategory');
-        const newsPrioritySelect=document.getElementById('newsPriority');
+        const newsRowSelect=document.getElementById('newsRow');
         const newsPositionInput=document.getElementById('newsPosition');
         const searchNewsInput=document.getElementById('searchNews');
 
@@ -371,7 +370,7 @@
                 if(camera.location===location&&camera.position===positionNum&&cameraId!==currentEditingCameraId)conflictCameraId=cameraId;
             });
             if(conflictCameraId){
-                positionWarning.textContent=`Position ${positionNum} is already occupied by camera ID:  ${conflictCameraId}. Saving will move that camera to the back.`;
+                positionWarning.textContent=`Position ${positionNum} is already occupied by camera ID: ${conflictCameraId}. Saving will move that camera to the back.`;
                 positionWarning.style.display='block';
             }else{positionWarning.style.display='none'}
         }
@@ -485,8 +484,8 @@
                 const card=document.createElement('div');card.className='news-card';card.setAttribute('data-id', item.id);card.setAttribute('draggable', true);
                 
                 // Format date for display
-                const date = new Date(item.timestamp || Date.now());
-                const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                const date = new Date(item.date || Date.now());
+                const formattedDate = date.toLocaleDateString();
                 
                 card.innerHTML=`
                     <div class="news-title"><i class="fas fa-grip-vertical drag-handle"></i><i class="fas fa-newspaper"></i> ${item.title}</div>
@@ -494,7 +493,7 @@
                     <div class="news-details">
                         <p><strong>ID: </strong> ${item.id}</p>
                         <p><strong>Category: </strong> ${item.category}</p>
-                        <p><strong>Priority: </strong> ${item.priority}</p>
+                        <p><strong>Row: </strong> ${item.row||'Not set'}</p>
                         <p><strong>Position: </strong> ${item.position||'Not set'}</p>
                     </div>
                     <div class="news-meta">
@@ -540,7 +539,7 @@
 
         // Open add news modal
         function openAddNewsModal(){
-            currentEditingNewsId=null;document.getElementById('newsModalTitle').textContent='Add New News';newsIdInput.value='';newsIdInput.disabled=false;newsTitleInput.value='';newsContentInput.value='';newsCategorySelect.value='traffic';newsPrioritySelect.value='medium';newsPositionInput.value='';newsModal.style.display='flex';
+            currentEditingNewsId=null;document.getElementById('newsModalTitle').textContent='Add New News';newsIdInput.value='';newsIdInput.disabled=false;newsTitleInput.value='';newsContentInput.value='';newsCategorySelect.value='traffic';newsRowSelect.value='1';newsPositionInput.value='';newsModal.style.display='flex';
         }
 
         // Edit camera
@@ -560,7 +559,7 @@
             database.ref('news/'+newsId).once('value').then(snapshot=>{
                 const news=snapshot.val();
                 if(news){
-                    newsIdInput.value=newsId;newsIdInput.disabled=true;newsTitleInput.value=news.title;newsContentInput.value=news.content;newsCategorySelect.value=news.category;newsPrioritySelect.value=news.priority;newsPositionInput.value=news.position||'';newsModal.style.display='flex';
+                    newsIdInput.value=newsId;newsIdInput.disabled=true;newsTitleInput.value=news.title;newsContentInput.value=news.content;newsCategorySelect.value=news.category;newsRowSelect.value=news.row||'1';newsPositionInput.value=news.position||'';newsModal.style.display='flex';
                 }else{showNotification('News item not found', true)}
             }).catch(err=>{console.error(err);showNotification('Failed to load news item', true)})
         }
@@ -596,18 +595,18 @@
             const title=newsTitleInput.value.trim();
             const content=newsContentInput.value.trim();
             const category=newsCategorySelect.value;
-            const priority=newsPrioritySelect.value;
+            const row=newsRowSelect.value;
             const position=newsPositionInput.value.trim();
             
             if(!newsId||!title||!content){showNotification('Please fill in all required fields', true);return}
             
             const newsData={
-                title: title, 
-                content: content, 
-                category: category, 
-                priority: priority, 
-                position: position ? parseInt(position) : null, 
-                timestamp: firebase.database.ServerValue.TIMESTAMP
+                title: title,  
+                content: content,  
+                category: category,  
+                row: row,
+                position: position ? parseInt(position) : null,  
+                date: new Date().toISOString().split('T')[0] // Use date instead of timestamp
             };
             
             // Check for position conflicts
