@@ -391,20 +391,40 @@
             setTimeout(()=>notification.style.display='none', 3000);
         }
 
-              // Login function
-        function login(){
-            const email=emailInput.value.trim();
-            const password=passwordInput.value.trim();
-            if(!email||!password){showNotification('Please enter both email and password', true);return}
-            if(email==='admin@macautraffic.com'&&password==='Admin123'){
-                isAuthenticated=true;
-                sessionStorage.setItem('isAuthenticated', 'true');
-                sessionStorage.setItem('activeTab', 'cameras');
-                authSection.remove();
-                camerasSection.style.display='block';
-                showNotification('Login successful!');
-            }else{showNotification('Invalid credentials. Please try again.', true)}
-        }
+// Login function
+function login() {
+    const email = emailInput.value.trim();
+    const password = passwordInput.value.trim();
+    
+    // Ensure email and password fields are filled
+    if (!email || !password) {
+        showNotification('Please enter both email and password', true);
+        return;
+    }
+
+    // Check credentials
+    if (email === 'admin@macautraffic.com' && password === 'Admin123') {
+        isAuthenticated = true;
+        sessionStorage.setItem('isAuthenticated', 'true');
+        sessionStorage.setItem('activeTab', 'cameras');
+        
+        // Hide the login section and show the cameras section
+        authSection.style.display = 'none'; // Hide login
+        camerasSection.style.display = 'block'; // Show cameras
+        newsSection.style.display = 'block';   // Show news section if relevant
+        
+        showNotification('Login successful!');
+        
+        // Optionally, load data after successful login
+        loadCameras(); 
+        loadNews();
+    } else {
+        showNotification('Invalid credentials. Please try again.', true);
+    }
+}
+
+// Event Listeners
+loginBtn.addEventListener('click', login);
         
         // Logout function
         function logout(){
