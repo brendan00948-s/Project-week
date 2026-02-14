@@ -1,4 +1,1478 @@
-<html>
-<h1> Coming Soon <h1>
-Planned Release: Sun Feb 15 00:10
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CNY Red Packet Group</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #ff6b6b;
+            --secondary: #4ecdc4;
+            --accent: #ffd166;
+            --dark: #1a535c;
+            --light: #f7fff7;
+            --success: #06d6a0;
+            --danger: #ef476f;
+            --warning: #ff9e00;
+            --wechat-green: #07c160;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(to right, var(--primary), #ff8e53);
+            color: white;
+            padding: 25px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 70%);
+            transform: rotate(30deg);
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.2);
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, var(--primary), #ff8e53);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+        
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+        
+        .btn-success {
+            background: linear-gradient(to right, var(--success), #05b38a);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(to right, var(--danger), #d4385f);
+            color: white;
+        }
+        
+        .btn-wechat {
+            background: var(--wechat-green);
+            color: white;
+        }
+        
+        .red-packet {
+            background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            color: white;
+            transition: transform 0.3s;
+        }
+        
+        .red-packet:hover {
+            transform: translateY(-5px);
+        }
+        
+        .red-packet::before {
+            content: "";
+            position: absolute;
+            top: -50px;
+            left: -50px;
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+        
+        .red-packet::after {
+            content: "";
+            position: absolute;
+            bottom: -50px;
+            right: -50px;
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+        
+        .red-packet h2 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .red-packet p {
+            font-size: 16px;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .red-packet-details {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .red-packet-info {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+        
+        .code-display {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 20px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin: 20px 0;
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #777;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .tab.active {
+            color: var(--primary);
+        }
+        
+        .tab.active::after {
+            content: "";
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 3px 3px 0 0;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .admin-panel {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .admin-panel h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .status {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #777;
+            font-size: 14px;
+            background: #f8f9fa;
+        }
+        
+        .user-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .user-info span {
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .red-packet-list {
+            margin-top: 20px;
+        }
+        
+        .red-packet-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--primary);
+            transition: transform 0.3s;
+        }
+        
+        .red-packet-item:hover {
+            transform: translateX(5px);
+        }
+        
+        .red-packet-item h4 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .red-packet-item p {
+            margin: 5px 0;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .claims-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .claims-table th, .claims-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .claims-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+        
+        .claims-table tr:hover {
+            background-color: #f1f1f1;
+        }
+        
+        .remaining {
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .packet-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .packet-actions .btn {
+            flex: 1;
+        }
+        
+        .admin-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .auth-container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        .auth-header {
+            background: linear-gradient(to right, var(--primary), #ff8e53);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .auth-content {
+            padding: 30px;
+        }
+        
+        .auth-switch {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+        }
+        
+        .auth-switch a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .auth-switch a:hover {
+            text-decoration: underline;
+        }
+        
+        .packet-stats {
+            display: flex;
+            justify-content: space-around;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .claim-center {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .mpay-link {
+            display: inline-block;
+            background: var(--success);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(6, 214, 160, 0.4);
+        }
+        
+        .mpay-link:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(6, 214, 160, 0.6);
+        }
+        
+        .wechat-group {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: #e8f3e9;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 15px 0;
+            color: var(--wechat-green);
+            font-weight: 500;
+        }
+        
+        .login-prompt {
+            background: #fff8e1;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+            border: 1px solid #ffecb3;
+        }
+        
+        .login-prompt a {
+            color: var(--primary);
+            font-weight: 600;
+            text-decoration: none;
+        }
+        
+        .login-prompt a:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                border-radius: 15px;
+            }
+            
+            .header {
+                padding: 20px 15px;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .red-packet-details {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .admin-controls {
+                grid-template-columns: 1fr;
+            }
+            
+            .tabs {
+                flex-wrap: wrap;
+            }
+            
+            .tab {
+                padding: 12px 15px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Authentication Screen -->
+    <div id="auth-screen" class="auth-container">
+        <div class="auth-header">
+            <h1><i class="fas fa-gift"></i> CNY Red Packet Group</h1>
+            <p>Join our WeChat group for exclusive rewards</p>
+        </div>
+        
+        <div class="auth-content">
+            <div id="login-form">
+                <div class="form-group">
+                    <label for="login-email"><i class="fas fa-envelope"></i> Email</label>
+                    <input type="email" id="login-email" placeholder="Enter your email">
+                </div>
+                <div class="form-group">
+                    <label for="login-password"><i class="fas fa-lock"></i> Password</label>
+                    <input type="password" id="login-password" placeholder="Enter your password">
+                </div>
+                <button class="btn btn-primary" id="login-btn">Login</button>
+                
+                <div class="auth-switch">
+                    <p>Don't have an account? <a href="#" id="show-signup">Sign Up</a></p>
+                </div>
+            </div>
+            
+            <div id="signup-form" class="hidden">
+                <div class="form-group">
+                    <label for="signup-name"><i class="fas fa-user"></i> Full Name</label>
+                    <input type="text" id="signup-name" placeholder="Enter your full name">
+                </div>
+                <div class="form-group">
+                    <label for="signup-email"><i class="fas fa-envelope"></i> Email</label>
+                    <input type="email" id="signup-email" placeholder="Enter your email">
+                </div>
+                <div class="form-group">
+                    <label for="signup-password"><i class="fas fa-lock"></i> Password</label>
+                    <input type="password" id="signup-password" placeholder="Create a password">
+                </div>
+                <div class="form-group">
+                    <label for="signup-confirm"><i class="fas fa-lock"></i> Confirm Password</label>
+                    <input type="password" id="signup-confirm" placeholder="Confirm your password">
+                </div>
+                <button class="btn btn-success" id="signup-btn">Sign Up</button>
+                
+                <div class="auth-switch">
+                    <p>Already have an account? <a href="#" id="show-login">Login</a></p>
+                </div>
+            </div>
+            
+            <div class="status hidden" id="auth-status"></div>
+        </div>
+    </div>
+    
+    <!-- Main Application -->
+    <div id="main-app" class="container hidden">
+        <div class="header">
+            <h1><i class="fas fa-gift"></i> CNY Red Packet Group</h1>
+            <p>Claim your exclusive rewards</p>
+        </div>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="home">Home</div>
+            <div class="tab" data-tab="claim">Claim Red Packets</div>
+            <div class="tab" data-tab="admin">Admin Panel</div>
+        </div>
+        
+        <div class="content">
+            <!-- Home Tab -->
+            <div class="tab-content active" id="home-tab">
+                <div class="user-info">
+                    <span>Welcome, <span id="user-name">User</span>!</span>
+                    <button class="btn btn-secondary" id="logout-btn">Logout</button>
+                </div>
+                
+                <div class="wechat-group">
+                    <i class="fab fa-weixin fa-2x"></i>
+                    <span>Join our WeChat group: CNY Red Packet</span>
+                </div>
+                
+                <div class="packet-stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="total-packets">0</div>
+                        <div class="stat-label">Total Packets</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="claimed-packets">0</div>
+                        <div class="stat-label">Claimed</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="available-packets">0</div>
+                        <div class="stat-label">Available</div>
+                    </div>
+                </div>
+                
+                <h2>Available Red Packets</h2>
+                <p>View and claim exclusive red packets below.</p>
+                
+                <div class="red-packet-list" id="public-packet-list">
+                    <!-- Public packets will be loaded here -->
+                </div>
+            </div>
+            
+            <!-- Claim Tab -->
+            <div class="tab-content" id="claim-tab">
+                <div class="user-info">
+                    <span>Logged in as: <span id="current-user">Not logged in</span></span>
+                    <button class="btn btn-secondary" id="logout-btn-2">Logout</button>
+                </div>
+                
+                <div class="wechat-group">
+                    <i class="fab fa-weixin fa-2x"></i>
+                    <span>Join our WeChat group: CNY Red Packet</span>
+                </div>
+                
+                <div class="red-packet-list" id="user-packet-list">
+                    <!-- User packets will be loaded here -->
+                </div>
+                
+                <div class="status hidden" id="claim-status"></div>
+            </div>
+            
+            <!-- Admin Panel Tab -->
+            <div class="tab-content" id="admin-tab">
+                <div class="form-group">
+                    <label for="admin-password"><i class="fas fa-key"></i> Admin Password</label>
+                    <input type="password" id="admin-password" placeholder="Enter admin password">
+                </div>
+                <button class="btn btn-primary" id="admin-login-btn">Access Admin Panel</button>
+                
+                <div id="admin-panel" class="admin-panel hidden">
+                    <h3><i class="fas fa-cog"></i> Red Packet Management</h3>
+                    
+                    <div class="admin-controls">
+                        <div>
+                            <div class="form-group">
+                                <label for="packet-title"><i class="fas fa-heading"></i> Title</label>
+                                <input type="text" id="packet-title" placeholder="Enter red packet title">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="packet-amount"><i class="fas fa-coins"></i> Amount (MOP)</label>
+                                <input type="number" id="packet-amount" placeholder="Enter amount">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="packet-total"><i class="fas fa-users"></i> Total Packets</label>
+                                <input type="number" id="packet-total" placeholder="Enter total number of packets">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="form-group">
+                                <label for="release-time"><i class="fas fa-clock"></i> Release Time</label>
+                                <input type="datetime-local" id="release-time">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="red-packet-link"><i class="fas fa-link"></i> Red Packet Link</label>
+                                <input type="text" id="red-packet-link" placeholder="Enter red packet link">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="packet-description"><i class="fas fa-align-left"></i> Description</label>
+                                <textarea id="packet-description" placeholder="Enter description" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-success" id="create-packet-btn">Create Red Packet</button>
+                    
+                    <h3 style="margin-top: 30px;"><i class="fas fa-list"></i> All Red Packets</h3>
+                    <div id="admin-packet-list">
+                        <!-- Admin packet list will be loaded here -->
+                    </div>
+                    
+                    <h3 style="margin-top: 30px;"><i class="fas fa-receipt"></i> Claims History</h3>
+                    <div class="form-group">
+                        <label for="packet-filter"><i class="fas fa-filter"></i> Filter by Packet</label>
+                        <select id="packet-filter">
+                            <option value="">All Packets</option>
+                        </select>
+                    </div>
+                    <div id="claims-history">
+                        <table class="claims-table">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Packet</th>
+                                    <th>Code</th>
+                                    <th>Time</th>
+                                </tr>
+                            </thead>
+                            <tbody id="claims-table-body">
+                                <!-- Claims will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="status hidden" id="admin-status"></div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>© 2023 CNY Red Packet Group | WeChat Community</p>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+        import { getDatabase, ref, set, push, onValue, update, remove, get, child, query, orderByChild } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+        
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyA4fWd7UDZEP5eQpzXWVMd2oUw0GPGaXrE",  
+            authDomain: "macau-traffic-14632.firebaseapp.com",  
+            databaseURL: "https://macau-traffic-14632-default-rtdb.firebaseio.com",  
+            projectId: "macau-traffic-14632",  
+            storageBucket: "macau-traffic-14632.firebasestorage.app",  
+            messagingSenderId: "291609032656",  
+            appId: "1:291609032656:web:8012d700d7c5884a1f6bd5",  
+            measurementId: "G-DXNNPQ0LT7"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app);
+        const database = getDatabase(app);
+
+        // DOM Elements
+        const authScreen = document.getElementById('auth-screen');
+        const mainApp = document.getElementById('main-app');
+        const loginForm = document.getElementById('login-form');
+        const signupForm = document.getElementById('signup-form');
+        const showSignup = document.getElementById('show-signup');
+        const showLogin = document.getElementById('show-login');
+        const loginBtn = document.getElementById('login-btn');
+        const signupBtn = document.getElementById('signup-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+        const logoutBtn2 = document.getElementById('logout-btn-2');
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const adminLoginBtn = document.getElementById('admin-login-btn');
+        const createPacketBtn = document.getElementById('create-packet-btn');
+        const currentUserSpan = document.getElementById('current-user');
+        const userNameSpan = document.getElementById('user-name');
+        const claimStatus = document.getElementById('claim-status');
+        const adminStatus = document.getElementById('admin-status');
+        const authStatus = document.getElementById('auth-status');
+        const publicPacketList = document.getElementById('public-packet-list');
+        const userPacketList = document.getElementById('user-packet-list');
+        const adminPacketList = document.getElementById('admin-packet-list');
+        const claimsTableBody = document.getElementById('claims-table-body');
+        const packetFilter = document.getElementById('packet-filter');
+        const totalPackets = document.getElementById('total-packets');
+        const claimedPackets = document.getElementById('claimed-packets');
+        const availablePackets = document.getElementById('available-packets');
+
+        // State variables
+        let currentUser = null;
+        let isAdmin = false;
+        let redPackets = [];
+        let claims = [];
+        let userClaims = [];
+
+        // Authentication Event Listeners
+        showSignup.addEventListener('click', (e) => {
+            e.preventDefault();
+            loginForm.classList.add('hidden');
+            signupForm.classList.remove('hidden');
+        });
+
+        showLogin.addEventListener('click', (e) => {
+            e.preventDefault();
+            signupForm.classList.add('hidden');
+            loginForm.classList.remove('hidden');
+        });
+
+        loginBtn.addEventListener('click', () => {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            if (!email || !password) {
+                showStatus(authStatus, 'Please enter both email and password', 'error');
+                return;
+            }
+            
+            signInWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    currentUser = userCredential.user;
+                    showStatus(authStatus, 'Login successful!', 'success');
+                    setTimeout(() => {
+                        authScreen.classList.add('hidden');
+                        mainApp.classList.remove('hidden');
+                        updateUserInfo();
+                        loadPublicPackets();
+                        loadUserClaims();
+                    }, 1500);
+                })
+                .catch((error) => {
+                    showStatus(authStatus, `Login failed: ${error.message}`, 'error');
+                });
+        });
+
+        signupBtn.addEventListener('click', () => {
+            const name = document.getElementById('signup-name').value;
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            const confirmPassword = document.getElementById('signup-confirm').value;
+            
+            if (!name || !email || !password || !confirmPassword) {
+                showStatus(authStatus, 'Please fill all fields', 'error');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                showStatus(authStatus, 'Passwords do not match', 'error');
+                return;
+            }
+            
+            createUserWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    currentUser = userCredential.user;
+                    
+                    // Save user data to database
+                    set(ref(database, 'users/' + currentUser.uid), {
+                        name: name,  
+                        email: email,  
+                        createdAt: new Date().getTime()
+                    });
+                    
+                    showStatus(authStatus, 'Account created successfully!', 'success');
+                    setTimeout(() => {
+                        authScreen.classList.add('hidden');
+                        mainApp.classList.remove('hidden');
+                        updateUserInfo();
+                        loadPublicPackets();
+                        loadUserClaims();
+                    }, 1500);
+                })
+                .catch((error) => {
+                    showStatus(authStatus, `Signup failed: ${error.message}`, 'error');
+                });
+        });
+
+        // Logout functionality
+        logoutBtn.addEventListener('click', logout);
+        logoutBtn2.addEventListener('click', logout);
+
+        function logout() {
+            signOut(auth).then(() => {
+                currentUser = null;
+                isAdmin = false;
+                userClaims = [];
+                authScreen.classList.remove('hidden');
+                mainApp.classList.add('hidden');
+                loginForm.classList.remove('hidden');
+                signupForm.classList.add('hidden');
+                document.getElementById('admin-panel').classList.add('hidden');
+                
+                // Clear forms
+                document.getElementById('login-email').value = '';
+                document.getElementById('login-password').value = '';
+                document.getElementById('signup-name').value = '';
+                document.getElementById('signup-email').value = '';
+                document.getElementById('signup-password').value = '';
+                document.getElementById('signup-confirm').value = '';
+            }).catch((error) => {
+                showStatus(authStatus, `Logout failed: ${error.message}`, 'error');
+            });
+        }
+
+        // Tab switching functionality
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs and contents
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(tc => tc.classList.remove('active'));
+                
+                // Add active class to clicked tab
+                tab.classList.add('active');
+                
+                // Show corresponding content
+                const tabId = tab.getAttribute('data-tab');
+                document.getElementById(`${tabId}-tab`).classList.add('active');
+                
+                // Load data when switching to tabs
+                if (tabId === 'home') {
+                    loadPublicPackets();
+                } else if (tabId === 'claim') {
+                    loadUserPackets();
+                } else if (tabId === 'admin' && isAdmin) {
+                    loadAdminData();
+                }
+            });
+        });
+
+        // Admin login functionality
+        adminLoginBtn.addEventListener('click', () => {
+            const adminPassword = document.getElementById('admin-password').value;
+            
+            if (!adminPassword) {
+                showStatus(adminStatus, 'Please enter admin password', 'error');
+                return;
+            }
+            
+            // In a real app, you would verify admin credentials with Firebase
+            if (adminPassword === 'Bb66896769') {
+                isAdmin = true;
+                document.getElementById('admin-panel').classList.remove('hidden');
+                showStatus(adminStatus, 'Admin access granted', 'success');
+                loadAdminData();
+            } else {
+                showStatus(adminStatus, 'Invalid admin password', 'error');
+            }
+        });
+
+        // Create red packet functionality
+        createPacketBtn.addEventListener('click', () => {
+            if (!isAdmin) {
+                showStatus(adminStatus, 'Access denied. Admin login required', 'error');
+                return;
+            }
+            
+            const title = document.getElementById('packet-title').value;
+            const amount = document.getElementById('packet-amount').value;
+            const total = document.getElementById('packet-total').value;
+            const releaseTime = document.getElementById('release-time').value;
+            const link = document.getElementById('red-packet-link').value;
+            const description = document.getElementById('packet-description').value;
+            
+            if (!title || !amount || !total || !releaseTime || !link) {
+                showStatus(adminStatus, 'Please fill all required fields', 'error');
+                return;
+            }
+            
+            // Create new red packet
+            const newPacket = {
+                title: title,  
+                amount: parseFloat(amount),  
+                total: parseInt(total),  
+                remaining: parseInt(total),  
+                releaseTime: new Date(releaseTime).getTime(),  
+                link: link,  
+                description: description || '',  
+                createdAt: new Date().getTime()
+            };
+            
+            // Save to Firebase
+            const packetRef = push(ref(database, 'red_packets'));
+            set(packetRef, newPacket)
+                .then(() => {
+                    showStatus(adminStatus, 'Red packet created successfully!', 'success');
+                    loadAdminData();
+                    
+                    // Clear form
+                    document.getElementById('packet-title').value = '';
+                    document.getElementById('packet-amount').value = '';
+                    document.getElementById('packet-total').value = '';
+                    document.getElementById('release-time').value = '';
+                    document.getElementById('red-packet-link').value = '';
+                    document.getElementById('packet-description').value = '';
+                })
+                .catch((error) => {
+                    showStatus(adminStatus, `Error saving packet: ${error.message}`, 'error');
+                });
+        });
+
+        // Helper functions
+        function showStatus(element, message, type) {
+            element.textContent = message;
+            element.className = `status ${type}`;
+            element.classList.remove('hidden');
+            
+            // Auto-hide after 3 seconds
+            setTimeout(() => {
+                element.classList.add('hidden');
+            }, 3000);
+        }
+
+        function generateRedPacketCode() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let code = '';
+            for (let i = 0; i < 12; i++) {
+                if (i > 0 && i % 4 === 0) code += '-';
+                code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return code;
+        }
+
+        function formatDate(timestamp) {
+            const date = new Date(timestamp);
+            return date.toLocaleString();
+        }
+
+        function updateUserInfo() {
+            if (currentUser) {
+                currentUserSpan.textContent = currentUser.email;
+                userNameSpan.textContent = currentUser.displayName || currentUser.email.split('@')[0];
+                
+                // Get user name from database
+                const userRef = ref(database, 'users/' + currentUser.uid);
+                get(userRef).then((snapshot) => {
+                    if (snapshot.exists()) {
+                        const userData = snapshot.val();
+                        if (userData && userData.name) {
+                            userNameSpan.textContent = userData.name;
+                        }
+                    }
+                });
+            }
+        }
+
+        // Firebase functions
+        function loadPublicPackets() {
+            publicPacketList.innerHTML = '<p>Loading red packets...</p>';
+            
+            const packetsRef = ref(database, 'red_packets');
+            onValue(packetsRef, (snapshot) => {
+                redPackets = [];
+                snapshot.forEach((childSnapshot) => {
+                    const packet = childSnapshot.val();
+                    packet.id = childSnapshot.key;
+                    redPackets.push(packet);
+                });
+                
+                // Sort by release time descending
+                redPackets.sort((a, b) => b.releaseTime - a.releaseTime);
+                renderPublicPackets();
+                updatePacketStats();
+            }, (error) => {
+                publicPacketList.innerHTML = `<p>Error loading packets: ${error.message}</p>`;
+            });
+        }
+
+        function updatePacketStats() {
+            let total = 0;
+            let claimed = 0;
+            let available = 0;
+            
+            redPackets.forEach(packet => {
+                total += packet.total;
+                claimed += (packet.total - packet.remaining);
+                available += packet.remaining;
+            });
+            
+            totalPackets.textContent = total;
+            claimedPackets.textContent = claimed;
+            availablePackets.textContent = available;
+        }
+
+        function renderPublicPackets() {
+            publicPacketList.innerHTML = '';
+            
+            if (redPackets.length === 0) {
+                publicPacketList.innerHTML = '<p>No red packets available at the moment.</p>';
+                return;
+            }
+            
+            redPackets.forEach(packet => {
+                const packetElement = document.createElement('div');
+                packetElement.className = 'red-packet-item';
+                packetElement.innerHTML = `
+                    <h4>${packet.title}</h4>
+                    <p><i class="fas fa-coins"></i> Amount: MOP ${packet.amount}</p>
+                    <p><i class="fas fa-users"></i> Remaining: <span class="remaining">${packet.remaining} / ${packet.total}</span></p>
+                    <p><i class="fas fa-clock"></i> Released: ${formatDate(packet.releaseTime)}</p>
+                    <p>${packet.description || ''}</p>
+                    <div class="claim-center" id="claim-center-${packet.id}">
+                        ${renderClaimButtonOrLink(packet)}
+                    </div>
+                `;
+                publicPacketList.appendChild(packetElement);
+            });
+            
+            // Add event listeners to claim buttons
+            document.querySelectorAll('.claim-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const packetId = e.target.getAttribute('data-id');
+                    claimRedPacket(packetId);
+                });
+            });
+        }
+
+        function renderClaimButtonOrLink(packet) {
+            // Check if user has already claimed this packet
+            const userClaim = userClaims.find(claim => claim.packetId === packet.id);
+            
+            if (userClaim) {
+                // User has already claimed this packet - show the link
+                return `
+                    <a href="${packet.link}" class="mpay-link" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Redeem on MPay
+                    </a>
+                    <p style="margin-top: 15px; font-weight: bold;">Your code: ${userClaim.code}</p>
+                `;
+            } else if (currentUser) {
+                // User is logged in but hasn't claimed yet
+                if (packet.remaining > 0) {
+                    return `<button class="btn btn-primary claim-btn" data-id="${packet.id}">Claim Now</button>`;
+                } else {
+                    return `<button class="btn btn-secondary" disabled>No More Available</button>`;
+                }
+            } else {
+                // User is not logged in
+                return `
+                    <button class="btn btn-secondary" disabled>Login to Claim</button>
+                    <div class="login-prompt">
+                        <p>Want to claim this red packet? <a href="#" id="login-link-${packet.id}">Login here</a></p>
+                    </div>
+                `;
+            }
+        }
+
+        function loadUserPackets() {
+            userPacketList.innerHTML = '<p>Loading your red packets...</p>';
+            
+            const packetsRef = ref(database, 'red_packets');
+            onValue(packetsRef, (snapshot) => {
+                redPackets = [];
+                snapshot.forEach((childSnapshot) => {
+                    const packet = childSnapshot.val();
+                    packet.id = childSnapshot.key;
+                    redPackets.push(packet);
+                });
+                
+                // Sort by release time descending
+                redPackets.sort((a, b) => b.releaseTime - a.releaseTime);
+                renderUserPackets();
+            }, (error) => {
+                userPacketList.innerHTML = `<p>Error loading packets: ${error.message}</p>`;
+            });
+        }
+
+        function renderUserPackets() {
+            userPacketList.innerHTML = '';
+            
+            if (redPackets.length === 0) {
+                userPacketList.innerHTML = '<p>No red packets available at the moment.</p>';
+                return;
+            }
+            
+            redPackets.forEach(packet => {
+                const packetElement = document.createElement('div');
+                packetElement.className = 'red-packet-item';
+                packetElement.innerHTML = `
+                    <h4>${packet.title}</h4>
+                    <p><i class="fas fa-coins"></i> Amount: MOP ${packet.amount}</p>
+                    <p><i class="fas fa-users"></i> Remaining: <span class="remaining">${packet.remaining} / ${packet.total}</span></p>
+                    <p><i class="fas fa-clock"></i> Released: ${formatDate(packet.releaseTime)}</p>
+                    <p>${packet.description || ''}</p>
+                    <div class="claim-center" id="claim-center-${packet.id}">
+                        ${renderClaimButtonOrLink(packet)}
+                    </div>
+                `;
+                userPacketList.appendChild(packetElement);
+            });
+            
+            // Add event listeners to claim buttons and login links
+            document.querySelectorAll('.claim-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const packetId = e.target.getAttribute('data-id');
+                    claimRedPacket(packetId);
+                });
+            });
+            
+            document.querySelectorAll('[id^="login-link-"]').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    tabs[2].click(); // Switch to login tab
+                });
+            });
+        }
+
+        function claimRedPacket(packetId) {
+            if (!currentUser) {
+                showStatus(claimStatus, 'Please login first to claim red packet', 'error');
+                return;
+            }
+            
+            // Check if user has already claimed this packet
+            const existingClaim = userClaims.find(claim => claim.packetId === packetId);
+            if (existingClaim) {
+                showStatus(claimStatus, 'You have already claimed this red packet', 'error');
+                return;
+            }
+            
+            const packet = redPackets.find(p => p.id === packetId);
+            if (!packet) {
+                showStatus(claimStatus, 'Red packet not found', 'error');
+                return;
+            }
+            
+            if (packet.remaining <= 0) {
+                showStatus(claimStatus, 'This red packet is no longer available', 'error');
+                return;
+            }
+            
+            // Generate a random code
+            const code = generateRedPacketCode();
+            
+            // Save claim to Firebase
+            const claimRef = push(ref(database, 'claims'));
+            set(claimRef, {
+                userId: currentUser.uid,  
+                userEmail: currentUser.email,  
+                userName: currentUser.displayName || currentUser.email.split('@')[0],  
+                packetId: packetId,  
+                packetTitle: packet.title,  
+                code: code,  
+                claimedAt: new Date().getTime()
+            }).then(() => {
+                // Update remaining count
+                const packetRef = ref(database, 'red_packets/' + packetId);
+                update(packetRef, {
+                    remaining: packet.remaining - 1
+                }).then(() => {
+                    // Add to user claims
+                    userClaims.push({
+                        packetId: packetId,  
+                        code: code
+                    });
+                    
+                    // Show success message with code
+                    showStatus(claimStatus, 'Red packet claimed successfully!', 'success');
+                    
+                    // Show MPay link in the center of the packet
+                    const claimCenter = document.getElementById(`claim-center-${packetId}`);
+                    claimCenter.innerHTML = `
+                        <a href="${packet.link}" class="mpay-link" target="_blank">
+                            <i class="fas fa-external-link-alt"></i> Redeem on MPay
+                        </a>
+                        <p style="margin-top: 15px; font-weight: bold;">Your code: ${code}</p>
+                    `;
+                    
+                    // Re-load packets
+                    loadUserPackets();
+                    loadPublicPackets();
+                });
+            }).catch((error) => {
+                showStatus(claimStatus, `Error claiming packet: ${error.message}`, 'error');
+            });
+        }
+
+        function loadAdminData() {
+            if (!isAdmin) return;
+            
+            // Load red packets
+            const packetsRef = ref(database, 'red_packets');
+            onValue(packetsRef, (snapshot) => {
+                redPackets = [];
+                snapshot.forEach((childSnapshot) => {
+                    const packet = childSnapshot.val();
+                    packet.id = childSnapshot.key;
+                    redPackets.push(packet);
+                });
+                
+                // Sort by release time descending
+                redPackets.sort((a, b) => b.releaseTime - a.releaseTime);
+                renderAdminPackets();
+                updatePacketFilter();
+            });
+            
+            // Load claims
+            const claimsRef = ref(database, 'claims');
+            onValue(claimsRef, (snapshot) => {
+                claims = [];
+                snapshot.forEach((childSnapshot) => {
+                    const claim = childSnapshot.val();
+                    claim.id = childSnapshot.key;
+                    claims.push(claim);
+                });
+                
+                // Sort by time descending
+                claims.sort((a, b) => b.claimedAt - a.claimedAt);
+                renderClaims();
+            });
+        }
+
+        function renderAdminPackets() {
+            adminPacketList.innerHTML = '';
+            
+            if (redPackets.length === 0) {
+                adminPacketList.innerHTML = '<p>No red packets created yet.</p>';
+                return;
+            }
+            
+            redPackets.forEach(packet => {
+                const packetElement = document.createElement('div');
+                packetElement.className = 'red-packet-item';
+                packetElement.innerHTML = `
+                    <h4>${packet.title}</h4>
+                    <p><i class="fas fa-coins"></i> Amount: MOP ${packet.amount}</p>
+                    <p><i class="fas fa-users"></i> Remaining: <span class="remaining">${packet.remaining} / ${packet.total}</span></p>
+                    <p><i class="fas fa-clock"></i> Released: ${formatDate(packet.releaseTime)}</p>
+                    <p><i class="fas fa-link"></i> Link: ${packet.link}</p>
+                    <p>${packet.description || ''}</p>
+                    <div class="packet-actions">
+                        <button class="btn btn-danger delete-packet-btn" data-id="${packet.id}">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                `;
+                adminPacketList.appendChild(packetElement);
+            });
+            
+            // Add event listeners to delete buttons
+            document.querySelectorAll('.delete-packet-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const packetId = e.target.closest('.delete-packet-btn').getAttribute('data-id');
+                    deleteRedPacket(packetId);
+                });
+            });
+        }
+
+        function deleteRedPacket(packetId) {
+            if (!confirm('Are you sure you want to delete this red packet?')) {
+                return;
+            }
+            
+            const packetRef = ref(database, 'red_packets/' + packetId);
+            remove(packetRef)
+                .then(() => {
+                    showStatus(adminStatus, 'Red packet deleted successfully!', 'success');
+                    loadAdminData();
+                })
+                .catch((error) => {
+                    showStatus(adminStatus, `Error deleting packet: ${error.message}`, 'error');
+                });
+        }
+
+        function updatePacketFilter() {
+            packetFilter.innerHTML = '<option value="">All Packets</option>';
+            
+            redPackets.forEach(packet => {
+                const option = document.createElement('option');
+                option.value = packet.id;
+                option.textContent = packet.title;
+                packetFilter.appendChild(option);
+            });
+            
+            // Add event listener to filter
+            packetFilter.addEventListener('change', () => {
+                renderClaims();
+            });
+        }
+
+        function renderClaims() {
+            claimsTableBody.innerHTML = '';
+            
+            if (claims.length === 0) {
+                claimsTableBody.innerHTML = '<tr><td colspan="4">No claims yet</td></tr>';
+                return;
+            }
+            
+            // Filter by selected packet
+            const selectedPacketId = packetFilter.value;
+            let filteredClaims = claims;
+            
+            if (selectedPacketId) {
+                filteredClaims = claims.filter(claim => claim.packetId === selectedPacketId);
+            }
+            
+            // Sort by time descending
+            filteredClaims.sort((a, b) => b.claimedAt - a.claimedAt);
+            
+            filteredClaims.forEach(claim => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${claim.userName || claim.userEmail}</td>
+                    <td>${claim.packetTitle}</td>
+                    <td>${claim.code}</td>
+                    <td>${formatDate(claim.claimedAt)}</td>
+                `;
+                claimsTableBody.appendChild(row);
+            });
+        }
+
+        function loadUserClaims() {
+            if (!currentUser) return;
+            
+            userClaims = [];
+            
+            const claimsRef = query(ref(database, 'claims'), orderByChild('userId'));
+            onValue(claimsRef, (snapshot) => {
+                snapshot.forEach((childSnapshot) => {
+                    const claim = childSnapshot.val();
+                    if (claim.userId === currentUser.uid) {
+                        userClaims.push({
+                            packetId: claim.packetId,  
+                            code: claim.code
+                        });
+                    }
+                });
+            });
+        }
+
+        // Initialize with some demo data
+        document.getElementById('release-time').value = new Date(Date.now() + 86400000).toISOString().slice(0, 16);
+        document.getElementById('red-packet-link').value = 'https://mpay.com/redeem';
+
+        // Simulate login for demo purposes
+        document.getElementById('admin-password').value = 'Bb66896769';
+        
+        // Check if user is already logged in
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                authScreen.classList.add('hidden');
+                mainApp.classList.remove('hidden');
+                updateUserInfo();
+                loadPublicPackets();
+                loadUserClaims();
+            } else {
+                authScreen.classList.remove('hidden');
+                mainApp.classList.add('hidden');
+            }
+        });
+        
+        // Load public packets for unauthenticated users
+        loadPublicPackets();
+    </script>
+</body>
 </html>
