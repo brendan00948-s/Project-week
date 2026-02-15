@@ -23,6 +23,8 @@
             --danger: #ef476f;
             --warning: #ff9e00;
             --wechat-green: #07c160;
+            --countdown-bg: #ff9e00;
+            --countdown-text: #fff;
         }
         
         body {
@@ -341,6 +343,8 @@
             margin-bottom: 15px;
             border-left: 4px solid var(--primary);
             transition: transform 0.3s;
+            position: relative;
+            overflow: hidden;
         }
         
         .red-packet-item:hover {
@@ -544,6 +548,63 @@
             margin: 0 10px;
         }
         
+        /* Countdown styles */
+        .countdown {
+            background: var(--countdown-bg);
+            color: var(--countdown-text);
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            text-align: center;
+            margin: 15px 0;
+            display: inline-block;
+        }
+        
+        .countdown .time {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .countdown .label {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+        
+        .countdown-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .countdown-box {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            padding: 8px;
+            min-width: 50px;
+        }
+        
+        .countdown-box .value {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .countdown-box .label {
+            font-size: 10px;
+            text-transform: uppercase;
+        }
+        
+        .not-released {
+            background: #ffeaa7;
+            border-left: 4px solid var(--warning);
+            color: #333;
+        }
+        
+        .not-released .countdown {
+            background: var(--warning);
+            color: white;
+        }
+        
         @media (max-width: 768px) {
             .container {
                 border-radius: 15px;
@@ -573,6 +634,15 @@
             .tab {
                 padding: 12px 15px;
                 font-size: 14px;
+            }
+            
+            .countdown-box {
+                min-width: 40px;
+                padding: 5px;
+            }
+            
+            .countdown-box .value {
+                font-size: 16px;
             }
         }
     </style>
@@ -791,13 +861,13 @@
         
         // Your web app's Firebase configuration
         const firebaseConfig = {
-            apiKey: "AIzaSyA4fWd7UDZEP5eQpzXWVMd2oUw0GPGaXrE",    
-            authDomain: "macau-traffic-14632.firebaseapp.com",    
-            databaseURL: "https://macau-traffic-14632-default-rtdb.firebaseio.com",    
-            projectId: "macau-traffic-14632",    
-            storageBucket: "macau-traffic-14632.firebasestorage.app",    
-            messagingSenderId: "291609032656",    
-            appId: "1:291609032656:web:8012d700d7c5884a1f6bd5",    
+            apiKey: "AIzaSyA4fWd7UDZEP5eQpzXWVMd2oUw0GPGaXrE",     
+            authDomain: "macau-traffic-14632.firebaseapp.com",     
+            databaseURL: "https://macau-traffic-14632-default-rtdb.firebaseio.com",     
+            projectId: "macau-traffic-14632",     
+            storageBucket: "macau-traffic-14632.firebasestorage.app",     
+            messagingSenderId: "291609032656",     
+            appId: "1:291609032656:web:8012d700d7c5884a1f6bd5",     
             measurementId: "G-DXNNPQ0LT7"
         };
 
@@ -827,7 +897,6 @@
         const claimStatus = document.getElementById('claim-status');
         const adminStatus = document.getElementById('admin-status');
         const authStatus = document.getElementById('auth-status');
-        const publicPacketList = document.getElementById('public-packet-list');
         const adminPacketList = document.getElementById('admin-packet-list');
         const claimsTableBody = document.getElementById('claims-table-body');
         const packetFilter = document.getElementById('packet-filter');
@@ -845,6 +914,7 @@
         let redPackets = [];
         let claims = [];
         let userClaims = [];
+        let countdownIntervals = {};
 
         // Authentication Event Listeners
         showSignup.addEventListener('click', (e) => {
@@ -909,8 +979,8 @@
                     
                     // Save user data to database
                     set(ref(database, 'users/' + currentUser.uid), {
-                        name: name,    
-                        email: email,    
+                        name: name,     
+                        email: email,     
                         createdAt: new Date().getTime()
                     });
                     
@@ -952,6 +1022,10 @@
                 document.getElementById('signup-email').value = '';
                 document.getElementById('signup-password').value = '';
                 document.getElementById('signup-confirm').value = '';
+                
+                // Clear countdown intervals
+                Object.values(countdownIntervals).forEach(interval => clearInterval(interval));
+                countdownIntervals = {};
                 
                 // Update UI for guest user
                 updateUserInfo();
@@ -1028,13 +1102,13 @@
             
             // Create new red packet
             const newPacket = {
-                title: title,    
-                amount: parseFloat(amount),    
-                total: parseInt(total),    
-                remaining: parseInt(total),    
-                releaseTime: new Date(releaseTime).getTime(),    
-                link: link,    
-                description: description || '',    
+                title: title,     
+                amount: parseFloat(amount),     
+                total: parseInt(total),     
+                remaining: parseInt(total),     
+                releaseTime: new Date(releaseTime).getTime(),     
+                link: link,     
+                description: description || '',     
                 createdAt: new Date().getTime()
             };
             
@@ -1227,6 +1301,8 @@
                 return;
             }
             
+            const now = new Date().getTime();
+            
             redPackets.forEach(packet => {
                 const packetElement = document.createElement('div');
                 packetElement.className = 'red-packet-item';
@@ -1234,8 +1310,23 @@
                 // Check if user has already claimed this packet
                 const userClaim = userClaims.find(claim => claim.packetId === packet.id);
                 
+                // Check if packet is released
+                const isReleased = packet.releaseTime <= now;
+                
                 let buttonHtml = '';
-                if (userClaim) {
+                if (!isReleased) {
+                    // Packet not released yet
+                    packetElement.classList.add('not-released');
+                    buttonHtml = `
+                        <div class="countdown-container" id="countdown-${packet.id}">
+                            <!-- Countdown will be rendered here -->
+                        </div>
+                        <button class="btn btn-secondary" disabled>
+                            <i class="fas fa-clock"></i>  Not Released Yet
+                        </button>
+                    `;
+                } else if (userClaim) {
+                    // User has already claimed this packet
                     buttonHtml = `
                         <a href="${packet.link}" class="mpay-link" target="_blank">
                             <i class="fas fa-external-link-alt"></i> Redeem on MPay
@@ -1243,8 +1334,10 @@
                         <p style="margin-top: 15px; font-weight: bold;">Your code: ${userClaim.code}</p>
                     `;
                 } else if (packet.remaining > 0) {
+                    // Packet available for claiming
                     buttonHtml = `<button class="btn btn-primary claim-btn" data-id="${packet.id}">Claim Now</button>`;
                 } else {
+                    // No more packets available
                     buttonHtml = `<button class="btn btn-secondary" disabled>No More Available</button>`;
                 }
                 
@@ -1259,6 +1352,11 @@
                     </div>
                 `;
                 packetListElement.appendChild(packetElement);
+                
+                // Start countdown if packet is not released yet
+                if (!isReleased) {
+                    startCountdown(packet.id, packet.releaseTime);
+                }
             });
             
             // Add event listeners to claim buttons
@@ -1268,6 +1366,61 @@
                     claimRedPacket(packetId);
                 });
             });
+        }
+
+        function startCountdown(packetId, releaseTime) {
+            const countdownElement = document.getElementById(`countdown-${packetId}`);
+            if (!countdownElement) return;
+            
+            // Clear any existing interval for this packet
+            if (countdownIntervals[packetId]) {
+                clearInterval(countdownIntervals[packetId]);
+            }
+            
+            const updateCountdown = () => {
+                const now = new Date().getTime();
+                const distance = releaseTime - now;
+                
+                if (distance <= 0) {
+                    // Packet is now released
+                    clearInterval(countdownIntervals[packetId]);
+                    delete countdownIntervals[packetId];
+                    loadPublicPackets(); // Reload to show claim button
+                    return;
+                }
+                
+                // Calculate days, hours, minutes and seconds
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                
+                // Render countdown
+                countdownElement.innerHTML = `
+                    <div class="countdown-box">
+                        <div class="value">${days}</div>
+                        <div class="label">Days</div>
+                    </div>
+                    <div class="countdown-box">
+                        <div class="value">${hours}</div>
+                        <div class="label">Hours</div>
+                    </div>
+                    <div class="countdown-box">
+                        <div class="value">${minutes}</div>
+                        <div class="label">Minutes</div>
+                    </div>
+                    <div class="countdown-box">
+                        <div class="value">${seconds}</div>
+                        <div class="label">Seconds</div>
+                    </div>
+                `;
+            };
+            
+            // Initial update
+            updateCountdown();
+            
+            // Update every second
+            countdownIntervals[packetId] = setInterval(updateCountdown, 1000);
         }
 
         function loadUserPackets() {
@@ -1306,6 +1459,8 @@
                 return;
             }
             
+            const now = new Date().getTime();
+            
             redPackets.forEach(packet => {
                 const packetElement = document.createElement('div');
                 packetElement.className = 'red-packet-item';
@@ -1313,8 +1468,23 @@
                 // Check if user has already claimed this packet
                 const userClaim = userClaims.find(claim => claim.packetId === packet.id);
                 
+                // Check if packet is released
+                const isReleased = packet.releaseTime <= now;
+                
                 let buttonHtml = '';
-                if (userClaim) {
+                if (!isReleased) {
+                    // Packet not released yet
+                    packetElement.classList.add('not-released');
+                    buttonHtml = `
+                        <div class="countdown-container" id="countdown-user-${packet.id}">
+                            <!-- Countdown will be rendered here -->
+                        </div>
+                        <button class="btn btn-secondary" disabled>
+                            <i class="fas fa-clock"></i> Not Released Yet
+                        </button>
+                    `;
+                } else if (userClaim) {
+                    // User has already claimed this packet
                     buttonHtml = `
                         <a href="${packet.link}" class="mpay-link" target="_blank">
                             <i class="fas fa-external-link-alt"></i> Redeem on MPay
@@ -1322,8 +1492,10 @@
                         <p style="margin-top: 15px; font-weight: bold;">Your code: ${userClaim.code}</p>
                     `;
                 } else if (packet.remaining > 0) {
+                    // Packet available for claiming
                     buttonHtml = `<button class="btn btn-primary claim-btn" data-id="${packet.id}">Claim Now</button>`;
                 } else {
+                    // No more packets available
                     buttonHtml = `<button class="btn btn-secondary" disabled>No More Available</button>`;
                 }
                 
@@ -1338,6 +1510,11 @@
                     </div>
                 `;
                 packetListElement.appendChild(packetElement);
+                
+                // Start countdown if packet is not released yet
+                if (!isReleased) {
+                    startCountdown(`user-${packet.id}`, packet.releaseTime);
+                }
             });
             
             // Add event listeners to claim buttons
@@ -1368,6 +1545,13 @@
                 return;
             }
             
+            // Check if packet is released
+            const now = new Date().getTime();
+            if (packet.releaseTime > now) {
+                showStatus(claimStatus, 'This red packet is not available yet', 'error');
+                return;
+            }
+            
             if (packet.remaining <= 0) {
                 showStatus(claimStatus, 'This red packet is no longer available', 'error');
                 return;
@@ -1379,12 +1563,12 @@
             // Save claim to Firebase
             const claimRef = push(ref(database, 'claims'));
             set(claimRef, {
-                userId: currentUser.uid,    
-                userEmail: currentUser.email,    
-                userName: currentUser.displayName || currentUser.email.split('@')[0],    
-                packetId: packetId,    
-                packetTitle: packet.title,    
-                code: code,    
+                userId: currentUser.uid,     
+                userEmail: currentUser.email,     
+                userName: currentUser.displayName || currentUser.email.split('@')[0],     
+                packetId: packetId,     
+                packetTitle: packet.title,     
+                code: code,     
                 claimedAt: new Date().getTime()
             }).then(() => {
                 // Update remaining count
@@ -1394,7 +1578,7 @@
                 }).then(() => {
                     // Add to user claims
                     userClaims.push({
-                        packetId: packetId,    
+                        packetId: packetId,     
                         code: code
                     });
                     
@@ -1567,7 +1751,7 @@
                     const claim = childSnapshot.val();
                     if (claim.userId === currentUser.uid) {
                         userClaims.push({
-                            packetId: claim.packetId,    
+                            packetId: claim.packetId,     
                             code: claim.code
                         });
                     }
