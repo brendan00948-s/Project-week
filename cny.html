@@ -788,6 +788,41 @@
             color: #333;
         }
         
+        /* Giveaway image styles */
+        .giveaway-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .winner-message {
+            background: #d4edda;
+            border: 2px solid var(--success);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+        
+        .winner-message h3 {
+            color: var(--success);
+            margin-bottom: 10px;
+        }
+        
+        .winner-message p {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
         @media (max-width: 768px) {
             .container {
                 border-radius: 15px;
@@ -1075,6 +1110,10 @@
                                     <label for="giveaway-winners"><i class="fas fa-trophy"></i> Number of Winners</label>
                                     <input type="number" id="giveaway-winners" placeholder="Enter number of winners" value="3">
                                 </div>
+                                <div class="form-group">
+                                    <label for="giveaway-image"><i class="fas fa-image"></i> Giveaway Image URL</label>
+                                    <input type="text" id="giveaway-image" placeholder="Enter image URL">
+                                </div>
                             </div>
                             <div>
                                 <div class="form-group">
@@ -1114,13 +1153,13 @@
         
         // Your web app's Firebase configuration
         const firebaseConfig = {
-            apiKey: "AIzaSyA4fWd7UDZEP5eQpzXWVMd2oUw0GPGaXrE",
-            authDomain: "macau-traffic-14632.firebaseapp.com",
-            databaseURL: "https://macau-traffic-14632-default-rtdb.firebaseio.com",
-            projectId: "macau-traffic-14632",
-            storageBucket: "macau-traffic-14632.firebasestorage.app",
-            messagingSenderId: "291609032656",
-            appId: "1:291609032656:web:8012d700d7c5884a1f6bd5",
+            apiKey: "AIzaSyA4fWd7UDZEP5eQpzXWVMd2oUw0GPGaXrE", 
+            authDomain: "macau-traffic-14632.firebaseapp.com", 
+            databaseURL: "https://macau-traffic-14632-default-rtdb.firebaseio.com", 
+            projectId: "macau-traffic-14632", 
+            storageBucket: "macau-traffic-14632.firebasestorage.app", 
+            messagingSenderId: "291609032656", 
+            appId: "1:291609032656:web:8012d700d7c5884a1f6bd5", 
             measurementId: "G-DXNNPQ0LT7"
         };
 
@@ -1241,8 +1280,8 @@
                     
                     // Save user data to database
                     set(ref(database, 'users/' + currentUser.uid), {
-                        name: name,
-                        email: email,
+                        name: name, 
+                        email: email, 
                         createdAt: new Date().getTime()
                     });
                     
@@ -1369,13 +1408,13 @@
             
             // Create new red packet
             const newPacket = {
-                title: title,
-                amount: parseFloat(amount),
-                total: parseInt(total),
-                remaining: parseInt(total),
-                releaseTime: new Date(releaseTime).getTime(),
-                link: link,
-                description: description || '',
+                title: title, 
+                amount: parseFloat(amount), 
+                total: parseInt(total), 
+                remaining: parseInt(total), 
+                releaseTime: new Date(releaseTime).getTime(), 
+                link: link, 
+                description: description || '', 
                 createdAt: new Date().getTime()
             };
             
@@ -1411,6 +1450,7 @@
             const winners = document.getElementById('giveaway-winners').value;
             const endTime = document.getElementById('giveaway-end-time').value;
             const description = document.getElementById('giveaway-description').value;
+            const image = document.getElementById('giveaway-image').value;
             
             if (!title || !prize || !winners || !endTime) {
                 showStatus(adminStatus, 'Please fill all required fields', 'error');
@@ -1419,12 +1459,13 @@
             
             // Create new giveaway
             const newGiveaway = {
-                title: title,
-                prizeValue: prize,
-                numberOfWinners: parseInt(winners),
-                endTime: new Date(endTime).getTime(),
-                description: description || '',
-                createdAt: new Date().getTime(),
+                title: title, 
+                prizeValue: prize, 
+                numberOfWinners: parseInt(winners), 
+                endTime: new Date(endTime).getTime(), 
+                description: description || '', 
+                image: image || '', 
+                createdAt: new Date().getTime(), 
                 isActive: true
             };
             
@@ -1441,6 +1482,7 @@
                     document.getElementById('giveaway-winners').value = '3';
                     document.getElementById('giveaway-end-time').value = '';
                     document.getElementById('giveaway-description').value = '';
+                    document.getElementById('giveaway-image').value = '';
                 })
                 .catch((error) => {
                     showStatus(adminStatus, `Error saving giveaway: ${error.message}`, 'error');
@@ -1641,7 +1683,15 @@
                 
                 const giveawayElement = document.createElement('div');
                 giveawayElement.className = `giveaway-card ${isActive ? 'active' : 'ended'}`;
+                
+                // Add image if available
+                let imageHtml = '';
+                if (giveaway.image) {
+                    imageHtml = `<img src="${giveaway.image}" alt="${giveaway.title}" class="giveaway-image">`;
+                }
+                
                 giveawayElement.innerHTML = `
+                    ${imageHtml}
                     <h3>${giveaway.title}</h3>
                     <p><i class="fas fa-gift"></i> Prize: ${giveaway.prizeValue}</p>
                     <p><i class="fas fa-trophy"></i> Winners: ${giveaway.numberOfWinners}</p>
@@ -1672,8 +1722,15 @@
             const now = new Date().getTime();
             const hasEnded = now >= giveaway.endTime;
             
+            // Add image if available
+            let imageHtml = '';
+            if (giveaway.image) {
+                imageHtml = `<img src="${giveaway.image}" alt="${giveaway.title}" class="giveaway-image">`;
+            }
+            
             let content = `
                 <div class="giveaway-header">
+                    ${imageHtml}
                     <h2><i class="fas fa-gift"></i> ${giveaway.title}</h2>
                     <p>${giveaway.description || ''}</p>
                 </div>
@@ -1832,6 +1889,21 @@
                 if (detailsContent) {
                     detailsContent.innerHTML += winnersContent;
                 }
+                
+                // Check if current user is a winner
+                const isWinner = winners.some(w => w.userId === currentUser.uid);
+                if (isWinner) {
+                    const winnerMessage = `
+                        <div class="winner-message">
+                            <h3>Congratulations! 🎉</h3>
+                            <p>You won the ${giveaway.title} giveaway!</p>
+                            <p>Please contact admin for your prize.</p>
+                        </div>
+                    `;
+                    if (detailsContent) {
+                        detailsContent.innerHTML = winnerMessage + detailsContent.innerHTML;
+                    }
+                }
             }
         }
 
@@ -1934,8 +2006,8 @@
                 // Add participant to database
                 const participantRef = push(ref(database, `giveaways/${giveawayId}/participants`));
                 set(participantRef, {
-                    userId: currentUser.uid,
-                    userName: userName,
+                    userId: currentUser.uid, 
+                    userName: userName, 
                     joinedAt: new Date().getTime()
                 }).then(() => {
                     showStatus(document.getElementById('giveaway-status'), 'Successfully joined the giveaway!', 'success');
@@ -2262,12 +2334,12 @@
             // Save claim to Firebase
             const claimRef = push(ref(database, 'claims'));
             set(claimRef, {
-                userId: currentUser.uid,
-                userEmail: currentUser.email,
-                userName: currentUser.displayName || currentUser.email.split('@')[0],
-                packetId: packetId,
-                packetTitle: packet.title,
-                code: code,
+                userId: currentUser.uid, 
+                userEmail: currentUser.email, 
+                userName: currentUser.displayName || currentUser.email.split('@')[0], 
+                packetId: packetId, 
+                packetTitle: packet.title, 
+                code: code, 
                 claimedAt: new Date().getTime()
             }).then(() => {
                 // Update remaining count
@@ -2277,7 +2349,7 @@
                 }).then(() => {
                     // Add to user claims
                     userClaims.push({
-                        packetId: packetId,
+                        packetId: packetId, 
                         code: code
                     });
                     
@@ -2419,9 +2491,16 @@
                 const hasEnded = now >= giveaway.endTime;
                 const status = hasEnded ? 'Ended' : (giveaway.isActive ? 'Active' : 'Inactive');
                 
+                // Add image if available
+                let imageHtml = '';
+                if (giveaway.image) {
+                    imageHtml = `<img src="${giveaway.image}" alt="${giveaway.title}" class="giveaway-image">`;
+                }
+                
                 const giveawayElement = document.createElement('div');
                 giveawayElement.className = 'red-packet-item';
                 giveawayElement.innerHTML = `
+                    ${imageHtml}
                     <h4>${giveaway.title}</h4>
                     <p><i class="fas fa-gift"></i> Prize: ${giveaway.prizeValue}</p>
                     <p><i class="fas fa-trophy"></i> Winners: ${giveaway.numberOfWinners}</p>
@@ -2432,7 +2511,7 @@
                         <button class="btn btn-danger delete-giveaway-btn" data-id="${giveaway.id}">
                             <i class="fas fa-trash"></i> Delete
                         </button>
-                        ${!hasEnded ? `<button class="btn btn-primary roll-winners-btn" data-id="${giveaway.id}">
+                        ${hasEnded ? `<button class="btn btn-primary roll-winners-btn" data-id="${giveaway.id}">
                             <i class="fas fa-random"></i> Roll Winners
                         </button>` : ''}
                     </div>
@@ -2513,6 +2592,12 @@
                 set(winnersRef, selectedWinners).then(() => {
                     showStatus(adminStatus, 'Winners selected successfully!', 'success');
                     loadAdminData();
+                    
+                    // Update the giveaway to mark it as having winners rolled
+                    const giveawayRef = ref(database, `giveaways/${giveawayId}`);
+                    update(giveawayRef, {
+                        winnersRolled: true
+                    });
                 }).catch((error) => {
                     showStatus(adminStatus, `Error selecting winners: ${error.message}`, 'error');
                 });
@@ -2578,7 +2663,7 @@
                     const claim = childSnapshot.val();
                     if (claim.userId === currentUser.uid) {
                         userClaims.push({
-                            packetId: claim.packetId,
+                            packetId: claim.packetId, 
                             code: claim.code
                         });
                     }
