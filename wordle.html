@@ -3,530 +3,842 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daily Wordle Challenge</title>
+    <title>Wordle - Sign Up & Login</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <style>
+        /* ... existing CSS styles remain unchanged ... */
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            box-sizing: border-box;
+            font-family: 'Clear Sans', 'Helvetica Neue', Arial, sans-serif;
         }
-        
+
         body {
-            background: #000;
-            color: #fff;
+            background: #121213;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+            color: #ffffff;
         }
-        
+
+        #backgroundElements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .background-element {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            animation: float 15s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            100% {
+                transform: translate(100px, 100px) rotate(360deg);
+            }
+        }
+
         .container {
-            background-color: #111;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             width: 100%;
             max-width: 500px;
-            padding: 30px;
+            background: #121213;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 10;
+        }
+
+        header {
             text-align: center;
-            border: 1px solid #333;
-        }
-        
-        h1 {
-            color: #fff;
-            margin-bottom: 20px;
-            font-size: 2.5rem;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-        }
-        
-        .subtitle {
-            color: #aaa;
-            margin-bottom: 25px;
-            font-size: 1.1rem;
-        }
-        
-        .game-info {
+            margin-bottom: 15px;
             display: flex;
             justify-content: space-between;
-            margin-bottom: 20px;
-            background-color: #222;
-            padding: 12px 20px;
-            border-radius: 10px;
-            font-weight: 500;
-            border: 1px solid #333;
+            align-items: center;
+            padding: 0 10px;
         }
-        
-        .info-item {
+
+        h1 {
+            color: #ffffff;
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: 0.2rem;
+            flex-grow: 1;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #d7dadc;
+        }
+
+        #current-date {
+            color: #a0a0a0;
+            font-size: 0.9rem;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .auth-container {
+            background: #1a1a1b;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #ffffff;
+        }
+
+        .auth-form {
             display: flex;
             flex-direction: column;
+            gap: 15px;
         }
-        
-        .info-label {
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-group label {
+            color: #a0a0a0;
             font-size: 0.9rem;
-            color: #888;
         }
-        
-        .info-value {
+
+        .form-group input {
+            padding: 12px 15px;
+            border-radius: 5px;
+            border: 1px solid #3a3a3c;
+            background: #121213;
+            color: #ffffff;
+            font-size: 1rem;
+        }
+
+        .auth-btn {
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            background: #538d4e;
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .auth-btn:hover {
+            background: #4a7d45;
+            transform: scale(1.02);
+        }
+
+        .switch-auth {
+            text-align: center;
+            margin-top: 15px;
+            color: #a0a0a0;
+            font-size: 0.9rem;
+        }
+
+        .switch-auth a {
+            color: #538d4e;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .stats-container {
+            display: flex;
+            justify-content: space-between;
+            background: #1a1a1b;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        .stat-box {
+            text-align: center;
+            color: #a0a0a0;
+            font-size: 0.8rem;
+        }
+
+        .stat-value {
             font-size: 1.2rem;
             font-weight: bold;
-            color: #fff;
+            color: #ffffff;
+            margin-top: 3px;
         }
-        
-        .board {
-            display: grid;
-            grid-template-rows: repeat(6, 1fr);
-            gap: 8px;
-            margin-bottom: 30px;
+
+        #board {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-bottom: 20px;
         }
-        
+
         .row {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 8px;
+            display: flex;
+            gap: 5px;
+            justify-content: center;
         }
-        
+
         .tile {
-            aspect-ratio: 1;
+            width: 62px;
+            height: 62px;
+            border: 2px solid #3a3a3c;
+            border-radius: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             font-size: 2rem;
             font-weight: bold;
-            background-color: #111;
-            border: 2px solid #444;
-            border-radius: 5px;
             text-transform: uppercase;
+            color: #ffffff;
             transition: all 0.3s ease;
+            background: transparent;
         }
-        
+
         .tile.filled {
-            border-color: #666;
+            border-color: #565758;
         }
-        
-        .tile.correct {
-            background-color: #538d4e;
-            border-color: #538d4e;
-            color: white;
-        }
-        
-        .tile.present {
-            background-color: #b59f3b;
-            border-color: #b59f3b;
-            color: white;
-        }
-        
-        .tile.absent {
-            background-color: #3a3a3c;
-            border-color: #3a3a3c;
-            color: white;
-        }
-        
+
         .tile.flip {
             animation: flip 0.5s ease forwards;
         }
-        
+
         @keyframes flip {
             0% {
                 transform: rotateX(0);
             }
-            45% {
-                transform: rotateX(90deg);
-            }
-            55% {
+            50% {
                 transform: rotateX(90deg);
             }
             100% {
                 transform: rotateX(0);
             }
         }
-        
-        .keyboard {
+
+        .tile.correct {
+            background-color: #538d4e;
+            border-color: #538d4e;
+            color: #ffffff;
+        }
+
+        .tile.present {
+            background-color: #b59f3b;
+            border-color: #b59f3b;
+            color: #ffffff;
+        }
+
+        .tile.absent {
+            background-color: #3a3a3c;
+            border-color: #3a3a3c;
+            color: #ffffff;
+        }
+
+        #message {
+            text-align: center;
+            color: #ffffff;
+            font-size: 1.1rem;
+            min-height: 30px;
+            margin: 15px 0;
+            font-weight: 500;
+        }
+
+        #keyboard {
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            margin-top: 20px;
+            gap: 6px;
         }
-        
+
         .keyboard-row {
             display: flex;
             justify-content: center;
             gap: 6px;
         }
-        
+
         .key {
-            height: 50px;
-            min-width: 40px;
-            padding: 0 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #333;
+            background: #818384;
             border: none;
             border-radius: 4px;
+            color: #ffffff;
+            font-size: 1rem;
             font-weight: bold;
+            padding: 15px 5px;
             cursor: pointer;
-            text-transform: uppercase;
             transition: all 0.2s ease;
-            color: #fff;
-        }
-        
-        .key:hover {
-            background-color: #444;
-        }
-        
-        .key.wide {
-            min-width: 65px;
-        }
-        
-        .key.correct {
-            background-color: #538d4e;
-            color: white;
-        }
-        
-        .key.present {
-            background-color: #b59f3b;
-            color: white;
-        }
-        
-        .key.absent {
-            background-color: #3a3a3c;
-            color: white;
-        }
-        
-        .message {
-            height: 30px;
-            margin: 15px 0;
-            font-weight: bold;
-            color: #fff;
-            font-size: 1.2rem;
-        }
-        
-        .win-message {
-            color: #538d4e;
-            font-weight: bold;
-            font-size: 1.5rem;
-            margin: 20px 0;
-            animation: pulse 1.5s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        
-        .instructions {
-            background-color: #222;
-            border-radius: 10px;
-            padding: 15px;
-            margin-top: 25px;
-            text-align: left;
-            border: 1px solid #333;
-        }
-        
-        .instructions h3 {
-            color: #fff;
-            margin-bottom: 10px;
-        }
-        
-        .instructions ul {
-            padding-left: 20px;
-        }
-        
-        .instructions li {
-            margin-bottom: 8px;
-            color: #aaa;
-        }
-        
-        .color-example {
-            display: flex;
-            align-items: center;
-            margin: 5px 0;
-        }
-        
-        .example-tile {
-            width: 25px;
-            height: 25px;
-            margin-right: 10px;
-            border-radius: 3px;
+            min-width: 40px;
             display: flex;
             justify-content: center;
             align-items: center;
-            color: white;
+            text-transform: uppercase;
+        }
+
+        .key:hover {
+            background: #6d6e6f;
+        }
+
+        .key.wide {
+            min-width: 65px;
+            font-size: 0.9rem;
+        }
+
+        .key.correct {
+            background-color: #538d4e;
+        }
+
+        .key.present {
+            background-color: #b59f3b;
+        }
+
+        .key.absent {
+            background-color: #3a3a3c;
+        }
+
+        .mode-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .mode-btn {
+            padding: 10px 20px;
+            background: #3a3a3c;
+            border: none;
+            border-radius: 30px;
+            color: #ffffff;
             font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .mode-btn.active {
+            background: #538d4e;
+            box-shadow: 0 0 10px rgba(83, 141, 78, 0.5);
+            color: #ffffff;
+        }
+
+        .mode-btn:hover {
+            background: #5a5a5c;
+        }
+
+        #unlimitedStats {
+            display: none;
+            justify-content: space-around;
+            background: #1a1a1b;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-label {
+            color: #a0a0a0;
             font-size: 0.8rem;
         }
-        
-        .example-text {
-            font-size: 0.9rem;
-            color: #aaa;
+
+        .stat-value {
+            color: #ffffff;
+            font-size: 1.3rem;
+            font-weight: bold;
         }
-        
-        /* Admin panel styles */
-        .admin-panel {
+
+        #gameContainer {
+            display: none;
+        }
+
+        .user-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1a1a1b;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        .user-name {
+            font-weight: bold;
+            color: #538d4e;
+        }
+
+        .logout-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .admin-panel, .leaderboard-panel {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            display: flex;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
             justify-content: center;
             align-items: center;
             z-index: 1000;
-            display: none;
         }
-        
-        .admin-content {
-            background: #111;
-            border: 1px solid #333;
-            border-radius: 10px;
+
+        .admin-content, .leaderboard-content {
+            background: #121213;
             padding: 30px;
+            border-radius: 5px;
             width: 90%;
-            max-width: 800px;
+            max-width: 600px;
             max-height: 90vh;
             overflow-y: auto;
+            color: white;
+            border: 1px solid #3a3a3c;
         }
-        
-        .admin-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        
+
         .close-btn {
-            background: #333;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #e74c3c;
             color: white;
             border: none;
-            padding: 5px 15px;
-            border-radius: 5px;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 1.5rem;
             cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
-        
+
         .admin-section {
             margin-bottom: 25px;
-            padding: 15px;
-            background: #222;
-            border-radius: 8px;
         }
-        
+
         .admin-section h3 {
             margin-bottom: 15px;
-            color: #fff;
+            color: #538d4e;
+            font-size: 1.2rem;
         }
-        
-        .stat-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #333;
-        }
-        
-        .stat-label {
-            color: #aaa;
-        }
-        
-        .stat-value {
-            color: #fff;
+
+        #currentWord {
             font-weight: bold;
+            color: #b59f3b;
         }
-        
-        .login-form {
-            background: #222;
-            padding: 30px;
-            border-radius: 10px;
-            max-width: 400px;
-            margin: 0 auto;
-        }
-        
-        .login-form h2 {
-            margin-bottom: 20px;
-            color: #fff;
-        }
-        
-        .login-form input {
+
+        input, select {
             width: 100%;
             padding: 12px;
-            margin-bottom: 20px;
-            border: 1px solid #444;
+            margin: 10px 0;
             border-radius: 5px;
-            background: #333;
-            color: #fff;
+            border: 1px solid #3a3a3c;
+            background: #1a1a1b;
+            color: white;
         }
-        
-        .login-form button {
+
+        button.admin-btn {
             width: 100%;
             padding: 12px;
-            background: #444;
+            background: #538d4e;
             color: white;
             border: none;
             border-radius: 5px;
-            cursor: pointer;
             font-weight: bold;
+            cursor: pointer;
+            margin: 10px 0;
         }
-        
-        .login-form button:hover {
-            background: #555;
+
+        button.admin-btn:hover {
+            background: #4a7d45;
         }
-        
-        @media (max-width: 500px) {
+
+        .status-message {
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .status-success {
+            background: #538d4e;
+            color: white;
+        }
+
+        .status-error {
+            background: #e74c3c;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #3a3a3c;
+        }
+
+        th {
+            background: #1a1a1b;
+            color: #538d4e;
+        }
+
+        .rank {
+            font-weight: bold;
+            color: #b59f3b;
+        }
+
+        .leaderboard-tabs {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            background: #1a1a1b;
+            border: none;
+            color: white;
+            cursor: pointer;
+        }
+
+        .tab-btn.active {
+            background: #538d4e;
+            color: white;
+        }
+
+        #showLeaderboard {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: #538d4e;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        #showLeaderboard:hover {
+            background: #4a7d45;
+            transform: scale(1.02);
+        }
+
+        .game-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .control-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .restart-btn {
+            background: #538d4e;
+            color: white;
+        }
+
+        .new-game-btn {
+            background: #b59f3b;
+            color: white;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
             .container {
                 padding: 15px;
             }
             
-            h1 {
-                font-size: 2rem;
-            }
-            
             .tile {
+                width: 14vw;
+                height: 14vw;
                 font-size: 1.5rem;
             }
             
             .key {
-                height: 40px;
-                min-width: 30px;
+                padding: 10px 5px;
                 font-size: 0.9rem;
+                min-width: 8vw;
             }
             
             .key.wide {
-                min-width: 50px;
+                min-width: 12vw;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .stats-container {
+                padding: 8px;
+            }
+            
+            .stat-value {
+                font-size: 1rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .tile {
+                width: 13vw;
+                height: 13vw;
+                font-size: 1.3rem;
+            }
+            
+            .key {
+                padding: 8px 3px;
+                font-size: 0.8rem;
+                min-width: 9vw;
+            }
+            
+            .key.wide {
+                min-width: 13vw;
+            }
+            
+            h1 {
+                font-size: 1.3rem;
+            }
+            
+            #current-date {
+                font-size: 0.8rem;
             }
         }
     </style>
 </head>
 <body>
-    <div class="login-form" id="loginForm">
-        <h2>Enter Your Name</h2>
-        <input type="text" id="playerName" placeholder="Your name">
-        <button id="startGame">Start Game</button>
-    </div>
-
-    <div class="container" id="gameContainer" style="display: none;">
-        <h1>WORDLE</h1>
-        <div class="subtitle">Guess the 5-letter word in 6 tries</div>
+    <div id="backgroundElements"></div>
+    
+    <div class="container">
+        <header>
+            <div class="header-icon" id="showStats">
+                <span class="material-symbols-outlined">bar_chart</span>
+            </div>
+            <h1>WORDLE</h1>
+            <div class="header-icon" id="showHelp">
+                <span class="material-symbols-outlined">help</span>
+            </div>
+        </header>
         
-        <div class="game-info">
-            <div class="info-item">
-                <span class="info-label">Date</span>
-                <span class="info-value" id="current-date">Loading...</span>
-            </div>
-            <div class="info-item">
-                <span class="info-label">Attempts</span>
-                <span class="info-value" id="attempts">0/6</span>
-            </div>
-            <div class="info-item">
-                <span class="info-label">Status</span>
-                <span class="info-value" id="game-status">Playing</span>
+        <div id="current-date"></div>
+        
+        <!-- Authentication Section -->
+        <div class="auth-container" id="authContainer">
+            <h2 class="auth-header" id="authHeader">Sign Up</h2>
+            <form class="auth-form" id="authForm">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit" class="auth-btn" id="authBtn">Sign Up</button>
+            </form>
+            <div class="switch-auth">
+                Already have an account? <a id="switchAuth">Login</a>
             </div>
         </div>
         
-        <div class="message" id="message"></div>
-        
-        <div class="board" id="board">
-            <!-- Rows will be generated by JavaScript -->
-        </div>
-        
-        <div class="keyboard" id="keyboard">
-            <!-- Keyboard will be generated by JavaScript -->
-        </div>
-        
-        <div class="instructions">
-            <h3>How to Play</h3>
-            <ul>
-                <li>Guess the WORDLE in 6 tries</li>
-                <li>Each guess must be a valid 5-letter word</li>
-                <li>After each guess, the color of the tiles will change to show how close your guess was to the word</li>
-            </ul>
+        <!-- Game Container -->
+        <div id="gameContainer">
+            <div class="user-info">
+                <div class="user-name" id="currentUserName">Player</div>
+                <button class="logout-btn" id="logoutBtn">Logout</button>
+            </div>
             
-            <div class="color-example">
-                <div class="example-tile" style="background-color: #538d4e;">W</div>
-                <div class="example-text">Correct letter in the correct position</div>
+            <div class="stats-container">
+                <div class="stat-box">
+                    <div>MODE</div>
+                    <div id="game-mode" class="stat-value">Daily</div>
+                </div>
+                <div class="stat-box">
+                    <div>ATTEMPTS</div>
+                    <div id="attempts" class="stat-value">0/6</div>
+                </div>
+                <div class="stat-box">
+                    <div>STATUS</div>
+                    <div id="game-status" class="stat-value">Playing</div>
+                </div>
             </div>
-            <div class="color-example">
-                <div class="example-tile" style="background-color: #b59f3b;">I</div>
-                <div class="example-text">Correct letter in the wrong position</div>
+            
+            <div class="mode-selector">
+                <button id="dailyModeBtn" class="mode-btn active">Daily Challenge</button>
+                <button id="unlimitedModeBtn" class="mode-btn">Unlimited</button>
             </div>
-            <div class="color-example">
-                <div class="example-tile" style="background-color: #3a3a3c;">N</div>
-                <div class="example-text">Letter not in the word</div>
+            
+            <div id="unlimitedStats">
+                <div class="stat-item">
+                    <div class="stat-label">Words Solved</div>
+                    <div id="wordsSolved" class="stat-value">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Current Streak</div>
+                    <div id="currentStreak" class="stat-value">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Best Streak</div>
+                    <div id="bestStreak" class="stat-value">0</div>
+                </div>
+            </div>
+            
+            <div id="board"></div>
+            
+            <div id="message"></div>
+            
+            <div id="keyboard"></div>
+            
+            <button id="showLeaderboard">View Leaderboard</button>
+            
+            <div class="game-controls">
+                <button class="control-btn restart-btn" id="restartGame">Restart</button>
+                <button class="control-btn new-game-btn" id="newGame">New Word</button>
             </div>
         </div>
     </div>
-
-    <!-- Admin Panel -->
+    
     <div class="admin-panel" id="adminPanel">
         <div class="admin-content">
-            <div class="admin-header">
-                <h2>Admin Statistics</h2>
-                <button class="close-btn" id="closeAdmin">Close</button>
-            </div>
+            <button class="close-btn" id="closeAdmin">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+            <h2>Admin Panel</h2>
+            <div id="adminStatus" class="status-message" style="display: none;"></div>
             
             <div class="admin-section">
                 <h3>Current Game Info</h3>
-                <div class="stat-item">
-                    <span class="stat-label">Current Word: </span>
-                    <span class="stat-value" id="currentWord">-</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">Date: </span>
-                    <span class="stat-value" id="adminDate">-</span>
+                <p>Date: <span id="adminDate"></span></p>
+                <p>Current Word: <span id="currentWord"></span></p>
+            </div>
+            
+            <div class="admin-section">
+                <h3>Change Daily Word</h3>
+                <input type="text" id="newWordInput" placeholder="Enter new 5-letter word" maxlength="5">
+                <button class="admin-btn" id="changeWordBtn">Change Word</button>
+            </div>
+            
+            <div class="admin-section">
+                <h3>User Guesses</h3>
+                <div id="userGuessesContainer" style="margin-top: 15px; max-height: 200px; overflow-y: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Player</th>
+                                <th>Guesses</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userGuessesBody">
+                            <tr><td colspan="2">No guesses found</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
             
             <div class="admin-section">
-                <h3>Player Statistics</h3>
-                <div class="stat-item">
-                    <span class="stat-label">Total Players: </span>
-                    <span class="stat-value" id="totalPlayers">0</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">Active Players: </span>
-                    <span class="stat-value" id="activePlayers">0</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">Games Won: </span>
-                    <span class="stat-value" id="gamesWon">0</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">Games Lost: </span>
-                    <span class="stat-value" id="gamesLost">0</span>
-                </div>
+                <h3>Ban Users</h3>
+                <select id="banUserSelect">
+                    <option value="">Select a user</option>
+                </select>
+                <button class="admin-btn" id="banUserBtn">Ban User</button>
             </div>
             
             <div class="admin-section">
-                <h3>Recent Players</h3>
-                <div id="recentPlayers">
-                    <!-- Player list will be populated here -->
-                </div>
-            </div>
-            
-            <div class="admin-section">
-                <h3>Previous Words</h3>
-                <div id="previousWords">
-                    <!-- Previous words will be listed here -->
+                <h3>View Game Records</h3>
+                <select id="recordFilter">
+                    <option value="all">All Records</option>
+                    <option value="daily">Daily Mode</option>
+                    <option value="unlimited">Unlimited Mode</option>
+                </select>
+                <button class="admin-btn" id="viewRecordsBtn">View Records</button>
+                <div id="recordsContainer" style="margin-top: 15px; max-height: 300px; overflow-y: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Player</th>
+                                <th>Word</th>
+                                <th>Mode</th>
+                                <th>Won</th>
+                                <th>Attempts</th>
+                                <th>Time</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recordsBody">
+                            <tr><td colspan="6">No records found</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     
+    <div class="leaderboard-panel" id="leaderboardPanel">
+        <div class="leaderboard-content">
+            <button class="close-btn" id="closeLeaderboard">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+            <h2>Leaderboard</h2>
+            
+            <div class="leaderboard-tabs">
+                <button class="tab-btn active" data-tab="daily">Daily</button>
+                <button class="tab-btn" data-tab="weekly">Weekly</button>
+                <button class="tab-btn" data-tab="monthly">Monthly</button>
+            </div>
+            
+            <div id="leaderboardContainer">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Player</th>
+                            <th>Attempts</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboardBody">
+                        <tr><td colspan="4">No data available</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // Word list for the game
-        const wordList = [
-            "APPLE", "BEACH", "CHAIR", "DREAM", "EAGLE",  
-            "FLAME", "GRAPE", "HOUSE", "IGLOO", "JUMBO",  
-            "KOALA", "LEMON", "MUSIC", "NIGHT", "OCEAN",  
-            "PIANO", "QUILT", "RIVER", "SNAKE", "TIGER",  
-            "UMBRA", "VIOLA", "WATER", "XENON", "YACHT", "ZEBRA", 
-            "CRANE", "SLATE", "PLANT", "BRICK", "FRAME",  
-            "GLASS", "SMILE", "CROWN", "LIGHT", "SHADE"
-        ];
-        
         // Game state
         let solution = "";
         let currentRow = 0;
@@ -535,50 +847,155 @@
         let gameWon = false;
         let attempts = 0;
         let playerName = "";
+        let gameStartTime = null;
+        let gameMode = "daily"; // "daily" or "unlimited"
+        let wordsSolved = 0;
+        let currentStreak = 0;
+        let bestStreak = 0;
+        let unlimitedStats = {};
+        let currentPlayerId = null;
+        let dailyWordOverride = null;
+        let currentUser = null;
+        let isAdmin = false;
+        let dailyWordSetByAdmin = false;
+        let dailyWordPlayed = false;
+        let userGuesses = {}; // Store user guesses
+        let bannedUsers = []; // Store banned users
+        let bannedIPs = []; // Store banned IPs
+        let userIPs = {}; // Store user IPs
         
         // DOM elements
+        const authContainer = document.getElementById('authContainer');
+        const authHeader = document.getElementById('authHeader');
+        const authForm = document.getElementById('authForm');
+        const authBtn = document.getElementById('authBtn');
+        const switchAuth = document.getElementById('switchAuth');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const gameContainer = document.getElementById('gameContainer');
+        const currentUserName = document.getElementById('currentUserName');
+        const logoutBtn = document.getElementById('logoutBtn');
         const board = document.getElementById('board');
         const messageEl = document.getElementById('message');
         const attemptsEl = document.getElementById('attempts');
         const gameStatusEl = document.getElementById('game-status');
         const currentDateEl = document.getElementById('current-date');
-        const loginForm = document.getElementById('loginForm');
-        const gameContainer = document.getElementById('gameContainer');
-        const playerNameInput = document.getElementById('playerName');
-        const startGameBtn = document.getElementById('startGame');
         const adminPanel = document.getElementById('adminPanel');
         const closeAdminBtn = document.getElementById('closeAdmin');
+        const adminStatus = document.getElementById('adminStatus');
+        const leaderboardPanel = document.getElementById('leaderboardPanel');
+        const closeLeaderboardBtn = document.getElementById('closeLeaderboard');
+        const showLeaderboardBtn = document.getElementById('showLeaderboard');
+        const leaderboardBody = document.getElementById('leaderboardBody');
+        const dailyModeBtn = document.getElementById('dailyModeBtn');
+        const unlimitedModeBtn = document.getElementById('unlimitedModeBtn');
+        const unlimitedStatsEl = document.getElementById('unlimitedStats');
+        const wordsSolvedEl = document.getElementById('wordsSolved');
+        const currentStreakEl = document.getElementById('currentStreak');
+        const bestStreakEl = document.getElementById('bestStreak');
+        const restartGameBtn = document.getElementById('restartGame');
+        const newGameBtn = document.getElementById('newGame');
         
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyC8VsAM7drgTfqHohgKFK-asuSMhAU0fS0", 
-            authDomain: "dragon-city-enjoyer.firebaseapp.com", 
-            databaseURL: "https://dragon-city-enjoyer-default-rtdb.firebaseio.com", 
-            projectId: "dragon-city-enjoyer", 
-            storageBucket: "dragon-city-enjoyer.firebasestorage.app", 
-            messagingSenderId: "146535472297", 
-            appId: "1:146535472297:web:961d91a902f03b6d93ddb8", 
-            measurementId: "G-RDJ43CLWZ5"
-        };
+        // Admin elements
+        const newWordInput = document.getElementById('newWordInput');
+        const changeWordBtn = document.getElementById('changeWordBtn');
+        const viewRecordsBtn = document.getElementById('viewRecordsBtn');
+        const recordsBody = document.getElementById('recordsBody');
+        const recordFilter = document.getElementById('recordFilter');
+        const userGuessesBody = document.getElementById('userGuessesBody');
+        const banUserSelect = document.getElementById('banUserSelect');
+        const banUserBtn = document.getElementById('banUserBtn');
         
-        // Initialize Firebase
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
+        // Create background elements
+        function createBackgroundElements() {
+            const container = document.getElementById('backgroundElements');
+            for (let i = 0; i < 15; i++) {
+                const element = document.createElement('div');
+                element.classList.add('background-element');
+                
+                // Random size
+                const size = Math.random() * 100 + 50;
+                element.style.width = `${size}px`;
+                element.style.height = `${size}px`;
+                
+                // Random position
+                element.style.left = `${Math.random() * 100}%`;
+                element.style.top = `${Math.random() * 100}%`;
+                
+                // Random animation duration
+                element.style.animationDuration = `${Math.random() * 20 + 10}s`;
+                
+                container.appendChild(element);
+            }
         }
-        const database = firebase.database();
+        
+        // Generate daily word using equation
+        function generateDailyWord() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = today.getMonth() + 1;
+            const day = today.getDate();
+            
+            // Simple equation to generate a "random" word index
+            const seed = (year * 365 + month * 31 + day) % 1000;
+            const wordIndex = seed % 50; // Assuming 50 words in our list
+            
+            // Word list for the game
+            const wordList = [
+                "APPLE", "BEACH", "CHAIR", "DREAM", "EAGLE", 
+                "FLAME", "GRAPE", "HOUSE", "IGLOO", "JUMBO", 
+                "KOALA", "LEMON", "MUSIC", "NIGHT", "OCEAN", 
+                "PIANO", "QUILT", "RIVER", "SNAKE", "TIGER", 
+                "UMBRA", "VIOLA", "WATER", "XENON", "YACHT", "ZEBRA", 
+                "CRANE", "SLATE", "PLANT", "BRICK", "FRAME", 
+                "GLASS", "SMILE", "CROWN", "LIGHT", "SHADE", 
+                "BRAVE", "CLOUD", "DANCE", "EARTH", "FLUTE", 
+                "GRACE", "HEART", "IVORY", "JEWEL", "KNIFE", 
+                "LEAFY", "MAGIC", "NURSE", "OCEAN", "PILOT"
+            ];
+            
+            return wordList[wordIndex];
+        }
         
         // Initialize the game
-        function initGame() {
+        async function initGame() {
             // Set current date
             const now = new Date();
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
             currentDateEl.textContent = now.toLocaleDateString('en-US', options);
             document.getElementById('adminDate').textContent = now.toLocaleDateString('en-US', options);
             
-            // Select a random word for today (based on date)
-            const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
-            solution = wordList[dayOfYear % wordList.length];
-            document.getElementById('currentWord').textContent = solution;
+            // Select a word based on game mode
+            if (gameMode === "daily") {
+                // Check if user has already played daily word
+                const today = new Date().toISOString().split('T')[0];
+                const dailyPlayedKey = `dailyPlayed_${currentUser.username}_${today}`;
+                dailyWordPlayed = localStorage.getItem(dailyPlayedKey) === 'true';
+                
+                if (dailyWordPlayed) {
+                    showMessage("You've already played today's word!");
+                    return;
+                }
+                
+                // Use override if set, otherwise get from Firebase
+                if (dailyWordOverride) {
+                    solution = dailyWordOverride;
+                    document.getElementById('currentWord').textContent = solution;
+                } else {
+                    // Get daily word from Firebase or generate automatically
+                    solution = await getDailyWord();
+                    document.getElementById('currentWord').textContent = solution;
+                }
+                unlimitedStatsEl.style.display = "none";
+                document.getElementById('game-mode').textContent = "Daily";
+            } else {
+                // Select a random word for unlimited mode
+                solution = generateDailyWord(); // Using same function for unlimited mode
+                document.getElementById('currentWord').textContent = solution;
+                unlimitedStatsEl.style.display = "flex";
+                updateUnlimitedStats();
+                document.getElementById('game-mode').textContent = "Unlimited";
+            }
             
             // Reset game state
             currentRow = 0;
@@ -586,6 +1003,7 @@
             gameOver = false;
             gameWon = false;
             attempts = 0;
+            gameStartTime = new Date(); // Record start time
             
             // Update UI
             attemptsEl.textContent = `${attempts}/6`;
@@ -597,9 +1015,31 @@
             
             // Create keyboard
             createKeyboard();
+        }
+        
+        // Get daily word from Firebase or generate a new one
+        async function getDailyWord() {
+            const today = new Date();
+            const dateKey = today.toISOString().split('T')[0]; // YYYY-MM-DD format
             
-            // Log player visit
-            logPlayerVisit();
+            // Simulate Firebase call
+            try {
+                // In a real app, this would be a Firebase call
+                // For this demo, we'll generate a word based on the date
+                const word = generateDailyWord();
+                return word;
+            } catch (error) {
+                console.error("Error getting daily word: ", error);
+                // Fallback to date-based selection
+                return generateDailyWord();
+            }
+        }
+        
+        // Update unlimited mode stats display
+        function updateUnlimitedStats() {
+            wordsSolvedEl.textContent = wordsSolved;
+            currentStreakEl.textContent = currentStreak;
+            bestStreakEl.textContent = bestStreak;
         }
         
         // Create the game board
@@ -627,8 +1067,8 @@
             keyboard.innerHTML = '';
             
             const keys = [
-                ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],  
-                ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],  
+                ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'], 
+                ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'], 
                 ['ENTER', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '⌫']
             ];
             
@@ -639,10 +1079,15 @@
                 row.forEach(key => {
                     const keyElement = document.createElement('button');
                     keyElement.classList.add('key');
-                    keyElement.textContent = key;
                     
-                    if (key === 'ENTER' || key === '⌫') {
+                    if (key === 'ENTER') {
+                        keyElement.innerHTML = '<span class="material-symbols-outlined">keyboard_return</span>';
                         keyElement.classList.add('wide');
+                    } else if (key === '⌫') {
+                        keyElement.innerHTML = '<span class="material-symbols-outlined">backspace</span>';
+                        keyElement.classList.add('wide');
+                    } else {
+                        keyElement.textContent = key;
                     }
                     
                     keyElement.addEventListener('click', () => handleKeyPress(key));
@@ -699,8 +1144,11 @@
                 guess += document.getElementById(`tile-${currentRow}-${i}`).textContent;
             }
             
-            // For simplicity, we'll assume all 5-letter combinations are valid
-            // In a real implementation, you'd check against a dictionary
+            // Store user guess
+            if (!userGuesses[currentUser.username]) {
+                userGuesses[currentUser.username] = [];
+            }
+            userGuesses[currentUser.username].push(guess);
             
             // Process the guess
             processGuess(guess);
@@ -741,7 +1189,9 @@
                 
                 // Update keyboard keys
                 const keyElement = Array.from(document.querySelectorAll('.key')).find(
-                    key => key.textContent === guessArray[i]
+                    key => key.textContent === guessArray[i] || 
+                           (key.innerHTML.includes('keyboard_return') && guessArray[i] === 'ENTER') ||
+                           (key.innerHTML.includes('backspace') && guessArray[i] === '⌫')
                 );
                 
                 if (keyElement) {
@@ -762,8 +1212,33 @@
                 gameWon = true;
                 gameOver = true;
                 gameStatusEl.textContent = "Won!";
+                
+                // Calculate game duration
+                const gameEndTime = new Date();
+                const gameDuration = Math.floor((gameEndTime - gameStartTime) / 1000); // in seconds
+                
                 showMessage(`Congratulations! You guessed it in ${attempts} tries!`);
-                logGameResult(true);
+                
+                // Save game result to Firebase
+                saveGameResult(true, attempts, gameDuration);
+                
+                // For daily mode, mark as played
+                if (gameMode === "daily") {
+                    const today = new Date().toISOString().split('T')[0];
+                    const dailyPlayedKey = `dailyPlayed_${currentUser.username}_${today}`;
+                    localStorage.setItem(dailyPlayedKey, 'true');
+                    dailyWordPlayed = true;
+                }
+                
+                // For unlimited mode, update stats
+                if (gameMode === "unlimited") {
+                    wordsSolved++;
+                    currentStreak++;
+                    if (currentStreak > bestStreak) {
+                        bestStreak = currentStreak;
+                    }
+                    updateUnlimitedStats();
+                }
                 return;
             }
             
@@ -771,8 +1246,21 @@
             if (attempts === 6) {
                 gameOver = true;
                 gameStatusEl.textContent = "Lost";
+                
+                // Calculate game duration
+                const gameEndTime = new Date();
+                const gameDuration = Math.floor((gameEndTime - gameStartTime) / 1000); // in seconds
+                
                 showMessage(`Game over! The word was: ${solution}`);
-                logGameResult(false);
+                
+                // Save game result to Firebase
+                saveGameResult(false, attempts, gameDuration);
+                
+                // For unlimited mode, reset streak
+                if (gameMode === "unlimited") {
+                    currentStreak = 0;
+                    updateUnlimitedStats();
+                }
                 return;
             }
             
@@ -781,12 +1269,143 @@
             currentTile = 0;
         }
         
+        // Save game result to Firebase
+        function saveGameResult(won, attempts, duration) {
+            // In a real app, this would save to Firebase
+            console.log("Game result saved: ", {
+                playerId: currentPlayerId, 
+                playerName: playerName, 
+                word: solution, 
+                won: won, 
+                attempts: won ? attempts : -1, 
+                duration: duration, 
+                date: new Date().toISOString(), 
+                mode: gameMode
+            });
+        }
+        
+        // Load leaderboard data from Firebase
+        function loadLeaderboard(period = 'daily') {
+            // Simulate Firebase data
+            const mockData = [
+                { playerName: "Player1", attempts: 3, duration: 45 }, 
+                { playerName: "Player2", attempts: 4, duration: 62 }, 
+                { playerName: "Player3", attempts: 2, duration: 38 }, 
+                { playerName: "Player4", attempts: 5, duration: 78 }, 
+                { playerName: "Player5", attempts: 3, duration: 52 }
+            ];
+            
+            leaderboardBody.innerHTML = '';
+            
+            mockData.forEach((entry, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="rank">${index + 1}</td>
+                    <td>${entry.playerName}</td>
+                    <td>${entry.attempts}</td>
+                    <td>${entry.duration}s</td>
+                `;
+                leaderboardBody.appendChild(row);
+            });
+        }
+        
         // Show a message to the user
         function showMessage(text) {
             messageEl.textContent = text;
             setTimeout(() => {
                 messageEl.textContent = "";
             }, 3000);
+        }
+        
+        // Show admin status message
+        function showAdminStatus(message, isSuccess) {
+            adminStatus.textContent = message;
+            adminStatus.className = "status-message " + (isSuccess ? "status-success" : "status-error");
+            adminStatus.style.display = "block";
+            
+            setTimeout(() => {
+                adminStatus.style.display = "none";
+            }, 3000);
+        }
+        
+        // Load game records for admin
+        function loadGameRecords(filter = 'all') {
+            // Simulate Firebase data
+            const mockData = [
+                { playerName: "Player1", word: "APPLE", mode: "daily", won: true, attempts: 3, date: "2023-05-15 10:30:00" }, 
+                { playerName: "Player2", word: "BEACH", mode: "unlimited", won: true, attempts: 4, date: "2023-05-15 11:15:00" }, 
+                { playerName: "Player3", word: "CHAIR", mode: "daily", won: false, attempts: -1, date: "2023-05-15 12:00:00" }, 
+                { playerName: "Player4", word: "DREAM", mode: "unlimited", won: true, attempts: 2, date: "2023-05-15 13:45:00" }, 
+                { playerName: "Player5", word: "EAGLE", mode: "daily", won: true, attempts: 5, date: "2023-05-15 14:20:00" }
+            ];
+            
+            recordsBody.innerHTML = '';
+            
+            mockData.forEach(record => {
+                const date = new Date(record.date);
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${record.playerName}</td>
+                    <td>${record.word}</td>
+                    <td>${record.mode}</td>
+                    <td>${record.won ? 'Yes' : 'No'}</td>
+                    <td>${record.won ? record.attempts : 'N/A'}</td>
+                    <td>${date.toLocaleString()}</td>
+                `;
+                recordsBody.appendChild(row);
+            });
+        }
+        
+        // Load user guesses for admin
+        function loadUserGuesses() {
+            userGuessesBody.innerHTML = '';
+            
+            for (const [username, guesses] of Object.entries(userGuesses)) {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${username}</td>
+                    <td>${guesses.join(', ')}</td>
+                `;
+                userGuessesBody.appendChild(row);
+            }
+            
+            if (Object.keys(userGuesses).length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = '<td colspan="2">No guesses found</td>';
+                userGuessesBody.appendChild(row);
+            }
+        }
+        
+        // Load users for ban dropdown
+        function loadUsersForBan() {
+            banUserSelect.innerHTML = '<option value="">Select a user</option>';
+            
+            // Simulate getting users from Firebase
+            const users = JSON.parse(localStorage.getItem('wordleUsers')) || {};
+            for (const username in users) {
+                if (username !== "Brendan") { // Don't allow banning admin
+                    const option = document.createElement('option');
+                    option.value = username;
+                    option.textContent = username;
+                    banUserSelect.appendChild(option);
+                }
+            }
+        }
+        
+        // Ban a user
+        function banUser(username) {
+            if (!username) return;
+            
+            // Add to banned users list
+            if (!bannedUsers.includes(username)) {
+                bannedUsers.push(username);
+                showAdminStatus(`User ${username} has been banned`, true);
+                
+                // In a real app, this would update Firebase
+                console.log(`Banned user: ${username}`);
+            } else {
+                showAdminStatus(`User ${username} is already banned`, false);
+            }
         }
         
         // Handle physical keyboard input
@@ -804,201 +1423,162 @@
             }
         });
         
-        // Log player visit to Firebase
-        function logPlayerVisit() {
-            if (!playerName) return;
-            
-            const now = new Date().toISOString();
-            const playerRef = database.ref('players/' + playerName);
-            
-            playerRef.once('value').then(snapshot => {
-                if (snapshot.exists()) {
-                    // Update existing player
-                    playerRef.update({
-                        lastVisit: now, 
-                        visits: snapshot.val().visits + 1
-                    });
-                } else {
-                    // Create new player
-                    playerRef.set({
-                        name: playerName, 
-                        firstVisit: now, 
-                        lastVisit: now, 
-                        visits: 1, 
-                        gamesPlayed: 0, 
-                        gamesWon: 0, 
-                        gamesLost: 0
-                    });
-                }
-            });
+        // Authentication functions
+        function showSignUp() {
+            authHeader.textContent = "Sign Up";
+            authBtn.textContent = "Sign Up";
+            switchAuth.innerHTML = 'Already have an account? <a id="switchAuth">Login</a>';
+            document.getElementById('switchAuth').addEventListener('click', showLogin);
         }
         
-        // Log game result to Firebase
-        function logGameResult(won) {
-            if (!playerName) return;
-            
-            const now = new Date().toISOString();
-            const playerRef = database.ref('players/' + playerName);
-            
-            playerRef.once('value').then(snapshot => {
-                if (snapshot.exists()) {
-                    const playerData = snapshot.val();
-                    const updates = {
-                        gamesPlayed: playerData.gamesPlayed + 1, 
-                        lastGame: now, 
-                        lastGameWord: solution, 
-                        lastGameWon: won
-                    };
-                    
-                    if (won) {
-                        updates.gamesWon = playerData.gamesWon + 1;
-                    } else {
-                        updates.gamesLost = playerData.gamesLost + 1;
-                    }
-                    
-                    playerRef.update(updates);
-                }
-            });
-            
-            // Log game to daily stats
-            const dateKey = new Date().toISOString().split('T')[0];
-            const dailyRef = database.ref('dailyStats/' + dateKey);
-            
-            dailyRef.once('value').then(snapshot => {
-                if (snapshot.exists()) {
-                    const dailyData = snapshot.val();
-                    const updates = {
-                        gamesPlayed: dailyData.gamesPlayed + 1
-                    };
-                    
-                    if (won) {
-                        updates.gamesWon = dailyData.gamesWon + 1;
-                    } else {
-                        updates.gamesLost = dailyData.gamesLost + 1;
-                    }
-                    
-                    dailyRef.update(updates);
-                } else {
-                    const initialData = {
-                        date: dateKey, 
-                        word: solution, 
-                        gamesPlayed: 1, 
-                        gamesWon: won ? 1 : 0, 
-                        gamesLost: won ? 0 : 1
-                    };
-                    dailyRef.set(initialData);
-                }
-            });
+        function showLogin() {
+            authHeader.textContent = "Login";
+            authBtn.textContent = "Login";
+            switchAuth.innerHTML = 'Don\'t have an account? <a id="switchAuth">Sign Up</a>';
+            document.getElementById('switchAuth').addEventListener('click', showSignUp);
         }
         
-        // Show admin panel if secret code entered
-        function showAdminPanel(secretCode) {
-            if (secretCode === "Bb66896769") {
-                adminPanel.style.display = "flex";
-                loadAdminStats();
+        // Sign up function
+        function signUp(username, password) {
+            // In a real app, this would save to Firebase
+            const users = JSON.parse(localStorage.getItem('wordleUsers')) || {};
+            
+            if (users[username]) {
+                showMessage("Username already exists!");
+                return false;
             }
+            
+            users[username] = {
+                password: password, 
+                createdAt: new Date().toISOString(), 
+                stats: {
+                    wordsSolved: 0, 
+                    currentStreak: 0, 
+                    bestStreak: 0
+                }
+            };
+            
+            localStorage.setItem('wordleUsers', JSON.stringify(users));
+            showMessage("Account created successfully!");
+            return true;
         }
         
-        // Load admin statistics
-        function loadAdminStats() {
-            // Load current word
-            document.getElementById('currentWord').textContent = solution;
+        // Login function
+        function login(username, password) {
+            const users = JSON.parse(localStorage.getItem('wordleUsers')) || {};
             
-            // Load player stats
-            database.ref('players').once('value').then(snapshot => {
-                const players = snapshot.val();
-                const playerCount = players ? Object.keys(players).length : 0;
-                document.getElementById('totalPlayers').textContent = playerCount;
-                
-                let activePlayers = 0;
-                let gamesWon = 0;
-                let gamesLost = 0;
-                
-                const recentPlayers = [];
-                if (players) {
-                    for (const key in players) {
-                        const player = players[key];
-                        if (player.lastVisit) {
-                            const lastVisit = new Date(player.lastVisit);
-                            const now = new Date();
-                            const diffHours = Math.abs(now - lastVisit) / 36e5;
-                            
-                            if (diffHours < 24) {
-                                activePlayers++;
-                            }
-                        }
-                        
-                        if (player.gamesWon) gamesWon += player.gamesWon;
-                        if (player.gamesLost) gamesLost += player.gamesLost;
-                        
-                        recentPlayers.push({
-                            name: player.name, 
-                            lastVisit: player.lastVisit, 
-                            gamesPlayed: player.gamesPlayed || 0, 
-                            gamesWon: player.gamesWon || 0
-                        });
+            // Check if user is banned
+            if (bannedUsers.includes(username)) {
+                showMessage("This account has been banned!");
+                return false;
+            }
+            
+            // Check for default admin account
+            if (username === "Brendan" && password === "Bb66896769") {
+                currentUser = {
+                    username: username,
+                    stats: {
+                        wordsSolved: 0,
+                        currentStreak: 0,
+                        bestStreak: 0
                     }
-                }
-                
-                document.getElementById('activePlayers').textContent = activePlayers;
-                document.getElementById('gamesWon').textContent = gamesWon;
-                document.getElementById('gamesLost').textContent = gamesLost;
-                
-                // Sort and display recent players
-                recentPlayers.sort((a, b) => new Date(b.lastVisit) - new Date(a.lastVisit));
-                const recentPlayersDiv = document.getElementById('recentPlayers');
-                recentPlayersDiv.innerHTML = '';
-                
-                recentPlayers.slice(0, 10).forEach(player => {
-                    const playerDiv = document.createElement('div');
-                    playerDiv.className = 'stat-item';
-                    playerDiv.innerHTML = `
-                        <span class="stat-label">${player.name}</span>
-                        <span class="stat-value">Games: ${player.gamesPlayed} | Wins: ${player.gamesWon}</span>
-                    `;
-                    recentPlayersDiv.appendChild(playerDiv);
-                });
-            });
+                };
+                isAdmin = true;
+                // Show admin panel
+                adminPanel.style.display = "flex";
+                // Load admin data
+                loadUserGuesses();
+                loadUsersForBan();
+            } else if (!users[username]) {
+                showMessage("User not found!");
+                return false;
+            } else if (users[username].password !== password) {
+                showMessage("Incorrect password!");
+                return false;
+            } else {
+                currentUser = {
+                    username: username,
+                    stats: users[username].stats
+                };
+                isAdmin = false;
+            }
             
-            // Load previous words
-            database.ref('dailyStats').orderByKey().limitToLast(10).once('value').then(snapshot => {
-                const dailyStats = snapshot.val();
-                const wordsDiv = document.getElementById('previousWords');
-                wordsDiv.innerHTML = '';
-                
-                if (dailyStats) {
-                    const sortedDates = Object.keys(dailyStats).sort().reverse();
-                    
-                    sortedDates.forEach(date => {
-                        const stat = dailyStats[date];
-                        const wordDiv = document.createElement('div');
-                        wordDiv.className = 'stat-item';
-                        wordDiv.innerHTML = `
-                            <span class="stat-label">${date}</span>
-                            <span class="stat-value">${stat.word} (${stat.gamesWon}/${stat.gamesPlayed})</span>
-                        `;
-                        wordsDiv.appendChild(wordDiv);
-                    });
-                }
-            });
+            // Update UI
+            currentUserName.textContent = username;
+            playerName = username;
+            
+            // Load user stats
+            if (!isAdmin) {
+                wordsSolved = currentUser.stats.wordsSolved || 0;
+                currentStreak = currentUser.stats.currentStreak || 0;
+                bestStreak = currentUser.stats.bestStreak || 0;
+            }
+            
+            // Hide auth container and show game
+            authContainer.style.display = "none";
+            gameContainer.style.display = "block";
+            
+            // Initialize game
+            initGame();
+            
+            showMessage(`Welcome back, ${username}!`);
+            return true;
+        }
+        
+        // Logout function
+        function logout() {
+            currentUser = null;
+            playerName = "";
+            isAdmin = false;
+            authContainer.style.display = "block";
+            gameContainer.style.display = "none";
+            adminPanel.style.display = "none";
+            showSignUp();
+        }
+        
+        // Save user stats
+        function saveUserStats() {
+            if (!currentUser || isAdmin) return;
+            
+            const users = JSON.parse(localStorage.getItem('wordleUsers')) || {};
+            users[currentUser.username].stats = {
+                wordsSolved: wordsSolved,
+                currentStreak: currentStreak,
+                bestStreak: bestStreak
+            };
+            
+            localStorage.setItem('wordleUsers', JSON.stringify(users));
         }
         
         // Event listeners
-        startGameBtn.addEventListener('click', () => {
-            playerName = playerNameInput.value.trim();
-            if (playerName) {
-                if (playerName === "Bb66896769") {
-                    showAdminPanel(playerName);
-                    return;
+        authForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value;
+            
+            if (!username || !password) {
+                showMessage("Please fill in all fields!");
+                return;
+            }
+            
+            if (authBtn.textContent === "Sign Up") {
+                if (signUp(username, password)) {
+                    login(username, password);
                 }
-                
-                loginForm.style.display = "none";
-                gameContainer.style.display = "block";
-                initGame();
             } else {
-                alert("Please enter your name");
+                login(username, password);
             }
         });
+        
+        switchAuth.addEventListener('click', () => {
+            if (authHeader.textContent === "Sign Up") {
+                showLogin();
+            } else {
+                showSignUp();
+            }
+        });
+        
+        logoutBtn.addEventListener('click', logout);
         
         closeAdminBtn.addEventListener('click', () => {
             adminPanel.style.display = "none";
@@ -1010,6 +1590,164 @@
                 adminPanel.style.display = "none";
             }
         });
+        
+        // Leaderboard event listeners
+        showLeaderboardBtn.addEventListener('click', () => {
+            // Load daily leaderboard by default
+            loadLeaderboard('daily');
+            leaderboardPanel.style.display = "flex";
+        });
+        
+        closeLeaderboardBtn.addEventListener('click', () => {
+            leaderboardPanel.style.display = "none";
+        });
+        
+        // Close leaderboard when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target === leaderboardPanel) {
+                leaderboardPanel.style.display = "none";
+            }
+        });
+        
+        // Leaderboard tabs
+        document.querySelectorAll('.tab-btn').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs
+                document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+                // Add active class to clicked tab
+                tab.classList.add('active');
+                // Load leaderboard for selected period
+                loadLeaderboard(tab.dataset.tab);
+            });
+        });
+        
+        // Mode selection
+        dailyModeBtn.addEventListener('click', () => {
+            gameMode = "daily";
+            dailyModeBtn.classList.add('active');
+            unlimitedModeBtn.classList.remove('active');
+            initGame();
+        });
+        
+        unlimitedModeBtn.addEventListener('click', () => {
+            gameMode = "unlimited";
+            unlimitedModeBtn.classList.add('active');
+            dailyModeBtn.classList.remove('active');
+            // Reset unlimited stats
+            wordsSolved = 0;
+            currentStreak = 0;
+            bestStreak = 0;
+            initGame();
+        });
+        
+        // Admin functionality
+        changeWordBtn.addEventListener('click', async () => {
+            const newWord = newWordInput.value.trim().toUpperCase();
+            if (newWord && newWord.length === 5 && /^[A-Z]+$/.test(newWord)) {
+                // Update Firebase daily word
+                try {
+                    await updateFirebaseDailyWord(newWord);
+                    dailyWordOverride = newWord;
+                    document.getElementById('currentWord').textContent = newWord;
+                    showAdminStatus("Daily word updated successfully in Firebase!", true);
+                    newWordInput.value = "";
+                    
+                    // If currently in daily mode, restart game with new word
+                    if (gameMode === "daily" && gameContainer.style.display !== "none") {
+                        initGame();
+                    }
+                } catch (error) {
+                    console.error("Error updating Firebase daily word: ", error);
+                    showAdminStatus("Failed to update daily word in Firebase", false);
+                }
+            } else {
+                showAdminStatus("Please enter a valid 5-letter word", false);
+            }
+        });
+        
+        // Function to update Firebase daily word
+        async function updateFirebaseDailyWord(word) {
+            // In a real implementation, this would update Firebase
+            // For this demo, we'll simulate the Firebase update
+            console.log("Updating Firebase daily word to: ", word);
+            
+            // Simulate Firebase update delay
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    // Store in localStorage for demo purposes
+                    const today = new Date().toISOString().split('T')[0];
+                    localStorage.setItem(`firebase_daily_word_${today}`, word);
+                    resolve();
+                }, 500);
+            });
+        }
+        
+        viewRecordsBtn.addEventListener('click', () => {
+            loadGameRecords(recordFilter.value);
+        });
+        
+        // Ban user button
+        banUserBtn.addEventListener('click', () => {
+            const selectedUser = banUserSelect.value;
+            if (selectedUser) {
+                banUser(selectedUser);
+                // Reload user list
+                loadUsersForBan();
+            } else {
+                showAdminStatus("Please select a user to ban", false);
+            }
+        });
+        
+        // Game control buttons
+        restartGameBtn.addEventListener('click', () => {
+            initGame();
+        });
+        
+        newGameBtn.addEventListener('click', () => {
+            if (gameMode === "unlimited") {
+                initGame();
+            } else {
+                showMessage("New word available tomorrow in Daily mode");
+            }
+        });
+        
+        // Help and stats buttons
+        document.getElementById('showHelp').addEventListener('click', () => {
+            alert("Guess the WORDLE in six tries.\n\nEach guess must be a valid five-letter word. Hit the enter button to submit.\n\nAfter each guess, the color of the tiles will change to show how close your guess was to the word.");
+        });
+        
+        document.getElementById('showStats').addEventListener('click', () => {
+            alert(`Current Stats: \nWords Solved: ${wordsSolved}\nCurrent Streak: ${currentStreak}\nBest Streak: ${bestStreak}`);
+        });
+        
+        // Initialize background elements
+        createBackgroundElements();
+        
+        // Create default admin account if it doesn't exist
+        function createDefaultAdminAccount() {
+            const users = JSON.parse(localStorage.getItem('wordleUsers')) || {};
+            
+            // Check if default admin account exists
+            if (!users["Brendan"]) {
+                users["Brendan"] = {
+                    password: "Bb66896769",
+                    createdAt: new Date().toISOString(),
+                    stats: {
+                        wordsSolved: 0,
+                        currentStreak: 0,
+                        bestStreak: 0
+                    }
+                };
+                
+                localStorage.setItem('wordleUsers', JSON.stringify(users));
+            }
+        }
+        
+        // Initialize default admin account
+        createDefaultAdminAccount();
+        
+        // Show sign up by default
+        showSignUp();
     </script>
 </body>
 </html>
