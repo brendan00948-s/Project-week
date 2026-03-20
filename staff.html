@@ -367,7 +367,7 @@
                 </div>
                 <div style="display: flex;gap: 15px;margin-top: 25px">
                     <button class="btn" id="saveBanBtn"><i class="fas fa-save"></i> Ban IP</button>
-                    <button class="btn btn-secondary" id="cancelBanBtn"><i class="fas fa-times"></i> Cancel</button>
+                    <button class=  "btn btn-secondary" id="cancelBanBtn"><i class="fas fa-times"></i> Cancel</button>
                 </div>
             </div>
         </div>
@@ -377,16 +377,15 @@
     </div>
 
     <script>
-        // Fixed Firebase config - removed extra spaces in URLs
-        const firebaseConfig = {
-            apiKey: "AIzaSyB1_sJvG1u47J3K0K0K0K0K0K0K0K0K0K0",        
-            authDomain: "macau-traffic-501cb.firebaseapp.com",        
-            databaseURL: "https://macau-traffic-501cb-default-rtdb.firebaseio.com",        
-            projectId: "macau-traffic-501cb",        
-            storageBucket: "macau-traffic-501cb.appspot.com",        
-            messagingSenderId: "123456789012",        
-            appId: "1:123456789012:web:abcdef1234567890abcdef"
-        };
+const firebaseConfig = {
+  apiKey: "AIzaSyCFk_4BSjnAE65-H7JxX8dOvtc86qlWlQ0",
+  authDomain: "macau-traffic-database.firebaseapp.com",
+  projectId: "macau-traffic-database",
+  storageBucket: "macau-traffic-database.firebasestorage.app",
+  messagingSenderId: "149938244922",
+  appId: "1:149938244922:web:b4edaf4298b7e15e899403",
+  measurementId: "G-JSSBLM1R4K"
+};
         
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
@@ -637,7 +636,7 @@
             }
             
             // Simple authentication check (in real app, this would be server-side)
-            if(email === 'admin@macautraffic.com' && password === 'ProjectWeek'){
+            if(email === 'admin@macautraffic.com' && password === 'Admin123'){
                 isAuthenticated = true;
                 
                 // Hide auth section and show cameras section
@@ -1521,4 +1520,4 @@
         init();
     </script>
 </body>
-</html
+</html>
