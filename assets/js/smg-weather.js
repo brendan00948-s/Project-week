@@ -25,22 +25,26 @@
     xmlDocument.querySelector("parsererror");
 
   const fetchFeed = async (url) => {
-    try {
-      const direct = await fetch(url);
-      if (direct.ok) {
-        return direct.text();
+    const targets = [
+      url,
+      `https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(url)}`,
+      `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`
+    ];
+
+    let lastError = null;
+    for (const target of targets) {
+      try {
+        const response = await fetch(target);
+        if (response.ok) {
+          return response.text();
+        }
+        lastError = new Error(`HTTP ${response.status} from ${target}`);
+      } catch (error) {
+        lastError = error;
       }
-    } catch (error) {
-      // Expected on many static hosts because SMG RSS may not send CORS headers.
     }
 
-    const proxied = await fetch(
-      `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`
-    );
-    if (!proxied.ok) {
-      throw new Error(`Unable to fetch ${url}`);
-    }
-    return proxied.text();
+    throw lastError || new Error(`Unable to fetch ${url}`);
   };
 
   const toText = (htmlString) => {
