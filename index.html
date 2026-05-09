@@ -1465,6 +1465,44 @@
             font-size: 2rem;
             margin-bottom: 10px;
         }
+
+        .rss-weather-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+        }
+
+        .rss-card {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .rss-card-title {
+            font-weight: bold;
+            color: #ffd700;
+            margin-bottom: 6px;
+            font-size: 0.95rem;
+        }
+
+        .rss-card-time {
+            font-size: 0.78rem;
+            opacity: 0.8;
+            margin-bottom: 6px;
+        }
+
+        .rss-card-text {
+            font-size: 0.92rem;
+            line-height: 1.45;
+        }
+
+        .rss-meta {
+            font-size: 0.8rem;
+            opacity: 0.85;
+            margin-top: 6px;
+        }
         
         @media (max-width: 768px) {
             .weather-panel {
@@ -1684,6 +1722,35 @@
                             <div class="loading" id="warning-loading">
                                 <div class="spinner"></div>
                                 <span>Loading warnings...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="weather-section">
+                        <h3><i class="fas fa-rss"></i> SMG RSS Alerts & Daily Weather</h3>
+                        <div class="warning-info">
+                            <div class="rss-weather-grid">
+                                <div>
+                                    <div class="rss-card-title">Latest Weather Alerts</div>
+                                    <div id="rss-alerts-container">
+                                        <div class="loading">
+                                            <div class="spinner"></div>
+                                            <span>Loading SMG RSS alerts...</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="rss-card-title">Daily Forecast</div>
+                                    <div id="rss-forecast-container">
+                                        <div class="loading">
+                                            <div class="spinner"></div>
+                                            <span>Loading SMG RSS forecast...</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="rss-meta">
+                                Source: <a href="https://rss.smg.gov.mo/" target="_blank" rel="noopener noreferrer">rss.smg.gov.mo</a>
                             </div>
                         </div>
                     </div>
@@ -3595,6 +3662,164 @@
                         weatherWarnings.innerHTML = '<p>Error loading warnings data</p>';
                     });
             }
+
+            async function fetchSmgFeedData(feedUrl) {
+                const targets = [
+                    {
+                        type: 'json',
+                        url: `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedUrl)}`
+                    },
+                    {
+                        type: 'xml',
+                        url: `https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(feedUrl)}`
+                    },
+                    {
+                        type: 'xml',
+                        url: `https://api.allorigins.win/raw?url=${encodeURIComponent(feedUrl)}`
+                    }
+                ];
+
+                let lastError = null;
+                for (const target of targets) {
+                    try {
+                        const response = await fetch(target.url);
+                        if (!response.ok) {
+                            lastError = new Error(`Failed ${response.status} from ${target.url}`);
+                            continue;
+                        }
+
+                        if (target.type === 'json') {
+                            const payload = await response.json();
+                            if (payload && payload.status === 'ok') {
+                                return { type: 'json', payload };
+                            }
+                            lastError = new Error('rss2json returned non-ok status');
+                            continue;
+                        }
+
+                        const xmlText = await response.text();
+                        const xml = new window.DOMParser().parseFromString(xmlText, 'text/xml');
+                        if (xml.querySelector('parsererror')) {
+                            lastError = new Error('Invalid XML from RSS endpoint');
+                            continue;
+                        }
+                        return { type: 'xml', payload: xml };
+                    } catch (error) {
+                        lastError = error;
+                    }
+                }
+
+                throw lastError || new Error('Unable to fetch SMG RSS feed');
+            }
+
+            function extractAlertRows(descriptionHtml) {
+                const wrapper = document.createElement('div');
+                wrapper.innerHTML = descriptionHtml || '';
+
+                return Array.from(wrapper.querySelectorAll('tr'))
+                    .slice(1)
+                    .map((row) => {
+                        const cells = Array.from(row.querySelectorAll('td')).map((cell) => cell.textContent.trim());
+                        return {
+                            type: cells[0] || 'Unknown',
+                            updatedAt: cells[1] || '',
+                            detail: cells[2] || 'No detail available'
+                        };
+                    })
+                    .filter((entry) => entry.type || entry.detail);
+            }
+
+            function extractForecastBlocks(descriptionHtml) {
+                const wrapper = document.createElement('div');
+                wrapper.innerHTML = (descriptionHtml || '').replace(/<br\s*\/?>/gi, '\n');
+                const text = (wrapper.textContent || '').trim();
+
+                return text
+                    .split(/\n\s*\n/g)
+                    .map((block) => block.trim())
+                    .filter(Boolean)
+                    .slice(0, 7);
+            }
+
+            function renderAlertsFromRows(rows) {
+                const alertsContainer = document.getElementById('rss-alerts-container');
+                if (!alertsContainer) return;
+
+                if (!rows.length) {
+                    alertsContainer.innerHTML = '<p>No active weather alert rows available.</p>';
+                    return;
+                }
+
+                alertsContainer.innerHTML = rows.map((row) => `
+                    <div class="rss-card">
+                        <div class="rss-card-title">${row.type}</div>
+                        <div class="rss-card-time">${row.updatedAt}</div>
+                        <div class="rss-card-text">${row.detail}</div>
+                    </div>
+                `).join('');
+            }
+
+            function renderForecastFromBlocks(blocks) {
+                const forecastContainer = document.getElementById('rss-forecast-container');
+                if (!forecastContainer) return;
+
+                if (!blocks.length) {
+                    forecastContainer.innerHTML = '<p>Daily forecast is currently unavailable.</p>';
+                    return;
+                }
+
+                forecastContainer.innerHTML = blocks.map((block) => {
+                    const lines = block
+                        .split('\n')
+                        .map((line) => line.trim())
+                        .filter(Boolean);
+                    const title = lines.shift() || 'Forecast';
+                    const content = lines.join(' ');
+                    return `
+                        <div class="rss-card">
+                            <div class="rss-card-title">${title}</div>
+                            <div class="rss-card-text">${content || 'No detail available'}</div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            async function loadSmgRssData() {
+                const alertsContainer = document.getElementById('rss-alerts-container');
+                const forecastContainer = document.getElementById('rss-forecast-container');
+                if (!alertsContainer || !forecastContainer) return;
+
+                try {
+                    const [alertsFeed, forecastFeed] = await Promise.all([
+                        fetchSmgFeedData('https://rss.smg.gov.mo/c_WSignal_rss.xml'),
+                        fetchSmgFeedData('https://rss.smg.gov.mo/c_WForecast7days_rss.xml')
+                    ]);
+
+                    let alertRows = [];
+                    if (alertsFeed.type === 'json') {
+                        const alertDescription = alertsFeed.payload.items?.[0]?.description || '';
+                        alertRows = extractAlertRows(alertDescription);
+                    } else {
+                        const alertDescription = alertsFeed.payload.querySelector('item description')?.textContent || '';
+                        alertRows = extractAlertRows(alertDescription);
+                    }
+                    renderAlertsFromRows(alertRows);
+
+                    let forecastBlocks = [];
+                    if (forecastFeed.type === 'json') {
+                        const forecastDescription = forecastFeed.payload.items?.[0]?.description || '';
+                        forecastBlocks = extractForecastBlocks(forecastDescription);
+                    } else {
+                        const forecastDescription = forecastFeed.payload.querySelector('item description')?.textContent || '';
+                        forecastBlocks = extractForecastBlocks(forecastDescription);
+                    }
+                    renderForecastFromBlocks(forecastBlocks);
+                } catch (error) {
+                    console.error('Error loading SMG RSS data:', error);
+                    alertsContainer.innerHTML = '<p>Error loading SMG weather alerts.</p>';
+                    forecastContainer.innerHTML = '<p>Error loading SMG daily forecast.</p>';
+                }
+            }
             
             // Initialize the application
             function init() {
@@ -3616,6 +3841,8 @@
             
             // Start the application
             init();
+            loadSmgRssData();
+            setInterval(loadSmgRssData, 300000);
         });
     </script>
     
