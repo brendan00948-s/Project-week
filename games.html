@@ -249,6 +249,7 @@
       display: flex;
       align-items: center;
       gap: 12px;
+      text-decoration: none;
       transition: background 0.22s ease, color 0.22s ease, transform 0.22s ease, box-shadow 0.22s ease, font-weight 0.15s;
     }
     .tab-button:hover {
@@ -5174,39 +5175,39 @@
     
     <div class="sidebar-scroll">
     <div class="sidebar-tabs">
-      <button class="tab-button active" data-page="main-page">
+      <a class="tab-button active" data-page="main-page" href="games-main.html">
         <i class="fas fa-home"></i> Main Page
-      </button>
-      <button class="tab-button" data-page="movies-page">
+      </a>
+      <a class="tab-button" data-page="movies-page" href="games-movies.html">
         <i class="fas fa-film"></i> Movies
-      </button>
-      <button class="tab-button" data-page="profile-page">
+      </a>
+      <a class="tab-button" data-page="profile-page" href="games-profile.html">
         <i class="fas fa-user"></i> Profile
-      </button>
-      <button class="tab-button" data-page="history-page">
+      </a>
+      <a class="tab-button" data-page="history-page" href="games-history.html">
         <i class="fas fa-history"></i> Play History
-      </button>
-      <button class="tab-button" data-page="shop-page">
+      </a>
+      <a class="tab-button" data-page="shop-page" href="games-shop.html">
         <i class="fas fa-shopping-bag"></i> Shop
-      </button>
-      <button class="tab-button" data-page="inventory-page">
+      </a>
+      <a class="tab-button" data-page="inventory-page" href="games-inventory.html">
         <i class="fas fa-box-open"></i> Inventory
-      </button>
-      <button class="tab-button" data-page="missions-page">
+      </a>
+      <a class="tab-button" data-page="missions-page" href="games-missions.html">
         <i class="fas fa-tasks"></i> Missions
-      </button>
-      <button class="tab-button" data-page="chat-page">
+      </a>
+      <a class="tab-button" data-page="chat-page" href="games-chat.html">
         <i class="fas fa-comments"></i> Chat
-      </button>
-      <button class="tab-button" data-page="friends-page">
+      </a>
+      <a class="tab-button" data-page="friends-page" href="games-friends.html">
         <i class="fas fa-user-friends"></i> Friends
-      </button>
-      <button class="tab-button" data-page="settings-page">
+      </a>
+      <a class="tab-button" data-page="settings-page" href="games-settings.html">
         <i class="fas fa-cog"></i> Settings
-      </button>
-      <button class="tab-button" data-page="staff-page" id="staff-panel-tab" style="display:none;">
+      </a>
+      <a class="tab-button" data-page="staff-page" id="staff-panel-tab" href="games-staff.html" style="display:none;">
         <i class="fas fa-shield-alt"></i> Staff Panel
-      </button>
+      </a>
     </div>
     </div>
     <div class="visually-hidden-balance-hooks" style="display:none;" aria-hidden="true">
@@ -5222,8 +5223,8 @@
       <div class="logo"><i class="fas fa-gamepad"></i><h1>GAME UNIVERSE</h1></div>
       <nav>
         <ul>
-          <li><a href="#" class="active" id="home-tab">Home</a></li>
-          <li><a href="#" id="contact-tab">Contact Us</a></li>
+          <li><a href="games-home.html" class="active" id="home-tab">Home</a></li>
+          <li><a href="games-contact.html" id="contact-tab">Contact Us</a></li>
           <li><div id="user-info" style="display: none;"><img id="user-avatar" src="" alt="Avatar"><span id="user-name"></span><button id="logout-btn">Logout</button></div></li>
         </ul>
       </nav>
@@ -6895,6 +6896,11 @@
         if (userUnsubscribe) userUnsubscribe();
         if (missionsListUnsub) { missionsListUnsub(); missionsListUnsub = null; }
         if (missionProgressUnsub) { missionProgressUnsub(); missionProgressUnsub = null; }
+        if (pendingPageRoute && isAuthRequiredPage(pendingPageRoute)) {
+          pendingPageRoute = null;
+          noticeModal.style.display = 'flex';
+          setRouteHash('main-page');
+        }
       }
     });
 
@@ -7371,6 +7377,21 @@
       'inventory-page', 'missions-page', 'chat-page', 'friends-page',
       'settings-page', 'staff-page', 'view-profile-page', 'home', 'contact'
     ]);
+    const PAGE_FILE_MAP = {
+      'home': 'games-home.html',
+      'contact': 'games-contact.html',
+      'main-page': 'games-main.html',
+      'movies-page': 'games-movies.html',
+      'profile-page': 'games-profile.html',
+      'history-page': 'games-history.html',
+      'shop-page': 'games-shop.html',
+      'inventory-page': 'games-inventory.html',
+      'missions-page': 'games-missions.html',
+      'chat-page': 'games-chat.html',
+      'friends-page': 'games-friends.html',
+      'settings-page': 'games-settings.html',
+      'staff-page': 'games-staff.html'
+    };
     let isApplyingRoute = false;
     function isAuthRequiredPage(pageId) {
       return pageId !== 'main-page' && pageId !== 'movies-page';
@@ -7379,18 +7400,20 @@
     function setRouteHash(routeId, options = {}) {
       const id = String(routeId || '').trim();
       if (!PAGE_ROUTE_IDS.has(id)) return;
+      if (options.reload) {
+        const file = PAGE_FILE_MAP[id] || `games.html?page=${encodeURIComponent(id)}`;
+        const currentFile = window.location.pathname.split('/').pop() || 'games.html';
+        if (currentFile === file) {
+          window.location.reload();
+        } else {
+          window.location.assign(file);
+        }
+        return;
+      }
       const url = new URL(window.location.href);
       url.searchParams.set('page', id);
       const nextPath = `${url.pathname}?${url.searchParams.toString()}`;
       const currentPath = `${window.location.pathname}${window.location.search}`;
-      if (options.reload) {
-        if (nextPath === currentPath) {
-          window.location.reload();
-        } else {
-          window.location.assign(nextPath);
-        }
-        return;
-      }
       if (nextPath !== currentPath) {
         window.history.replaceState(null, '', nextPath);
       }
@@ -7687,10 +7710,19 @@
 
     // ========== Sidebar page switching ==========
     document.querySelectorAll('.sidebar-tabs .tab-button').forEach(button => {
-      button.addEventListener('click', () => {
+      button.addEventListener('click', (e) => {
         const pageId = button.getAttribute('data-page');
         if (!pageId) return;
+        e.preventDefault();
         if (!isApplyingRoute) {
+          if (!currentUser && isAuthRequiredPage(pageId)) {
+            if (!authStateKnown) {
+              pendingPageRoute = pageId;
+              return;
+            }
+            noticeModal.style.display = 'flex';
+            return;
+          }
           setRouteHash(pageId, { reload: true });
           return;
         }
