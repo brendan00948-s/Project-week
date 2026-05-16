@@ -7363,7 +7363,7 @@
         }
         if (pendingGame) { showConfirmModal(pendingGame); pendingGame = null; }
         if (pendingMovie) {
-          navigateToMovieUrl(pendingMovie);
+          openMovieInfoModal(pendingMovie, { syncUrl: true, pushHistory: false });
           pendingMovie = null;
         }
         sidebar.classList.add('active');
@@ -7568,11 +7568,15 @@
       return true;
     }
 
-    function closeMovieInfoModal() {
+    function closeMovieInfoModal(options = {}) {
+      const wasOpen = movieInfoModal?.style.display === 'block';
       if (movieInfoModal) movieInfoModal.style.display = 'none';
       activeMoviePreview = null;
       const gameModalVisible = gameModal && gameModal.style.display === 'block';
       document.body.style.overflow = gameModalVisible ? 'hidden' : 'auto';
+      if (!options.skipUrlUpdate && (wasOpen || getRequestedMovieIdFromUrl())) {
+        updateMoviePreViewUrl('', { pushHistory: false });
+      }
     }
 
     function resolveMovieUrl(url) {
@@ -7587,13 +7591,52 @@
       }
     }
 
-    function navigateToMovieUrl(movie) {
-      const resolved = resolveMovieUrl(movie?.url);
-      if (!resolved) {
-        showNotification('This movie has no valid movie URL yet.', 'error');
+    function getRequestedMovieIdFromUrl() {
+      return String(new URLSearchParams(window.location.search).get('movie') || '').trim();
+    }
+
+    function updateMoviePreViewUrl(movieId, options = {}) {
+      const nextMovieId = String(movieId || '').trim();
+      const url = new URL(window.location.href);
+      if (nextMovieId) url.searchParams.set('movie', nextMovieId);
+      else url.searchParams.delete('movie');
+      if (nextMovieId && url.searchParams.get('page') !== 'movies-page') {
+        url.searchParams.set('page', 'movies-page');
+      }
+      const next = `${url.pathname}?${url.searchParams.toString()}`;
+      const current = `${window.location.pathname}${window.location.search}`;
+      if (next === current) return;
+      if (options.pushHistory) {
+        window.history.pushState(null, '', next);
+      } else {
+        window.history.replaceState(null, '', next);
+      }
+    }
+
+    function findMovieById(movieId) {
+      const id = String(movieId || '').trim();
+      if (!id || !appMoviesDataCache?.moviesByCategory) return null;
+      for (const list of Object.values(appMoviesDataCache.moviesByCategory)) {
+        const found = (list || []).find((m) => String(m.id) === id);
+        if (found) return found;
+      }
+      return null;
+    }
+
+    function maybeOpenMovieFromUrlParam(options = {}) {
+      const requestedId = getRequestedMovieIdFromUrl();
+      if (!requestedId) {
+        if (options.closeIfMissing && movieInfoModal?.style.display === 'block') {
+          closeMovieInfoModal({ skipUrlUpdate: true });
+        }
         return false;
       }
-      window.location.assign(resolved);
+      const movie = findMovieById(requestedId);
+      if (!movie) {
+        if (options.clearInvalid !== false) updateMoviePreViewUrl('', { pushHistory: false });
+        return false;
+      }
+      openMovieInfoModal(movie, { syncUrl: false });
       return true;
     }
 
@@ -7608,7 +7651,7 @@
       };
     }
 
-    function openMovieInfoModal(movie) {
+    function openMovieInfoModal(movie, options = {}) {
       if (!movieInfoModal || !movie) return;
       activeMoviePreview = movie;
       const titleText = String(movie.title || '').trim() || 'Movie title';
@@ -7654,6 +7697,9 @@
         movieInfoWatchBtn.disabled = !canWatch;
         movieInfoWatchBtn.textContent = canWatch ? 'WATCH MOVIE' : 'MOVIE LINK NOT SET';
       }
+      if (options.syncUrl !== false) {
+        updateMoviePreViewUrl(movie.id, { pushHistory: Boolean(options.pushHistory) });
+      }
       movieInfoModal.style.display = 'block';
       document.body.style.overflow = 'hidden';
     }
@@ -7667,7 +7713,7 @@
         noticeModal.style.display = 'flex';
         return;
       }
-      closeMovieInfoModal();
+      closeMovieInfoModal({ skipUrlUpdate: true });
       window.location.assign(resolved);
     }
 
@@ -7708,16 +7754,8 @@
     }
 
     async function handleMovieClick(movie) {
-      if (!movie?.url) {
-        showNotification('This movie has no movie URL yet.', 'error');
-        return;
-      }
-      if (!currentUser) {
-        pendingMovie = movie;
-        noticeModal.style.display = 'flex';
-        return;
-      }
-      navigateToMovieUrl(movie);
+      if (!movie) return;
+      openMovieInfoModal(movie, { syncUrl: true, pushHistory: true });
     }
 
     async function toggleFavoriteMovie(movieId) {
@@ -7969,6 +8007,7 @@
     async function mountMoviesPageContent() {
       if (moviesPageMounted && appMoviesDataCache) {
         renderMovieGridCards();
+        maybeOpenMovieFromUrlParam({ closeIfMissing: true });
         return;
       }
       if (moviesPageMountPromise) return moviesPageMountPromise;
@@ -7979,6 +8018,7 @@
           appMoviesDataCache = data;
         }
         renderMoviesPage(data);
+        maybeOpenMovieFromUrlParam({ closeIfMissing: true });
         movieSearchInput?.removeEventListener('input', handleMovieSearchInput);
         movieSearchInput?.addEventListener('input', handleMovieSearchInput);
         moviesPageMounted = true;
