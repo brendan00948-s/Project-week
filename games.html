@@ -7459,7 +7459,8 @@
           password: {
             required: profileDocData?.passwordMigrationRequired === true,
             version: String(profileDocData?.passwordMigrationVersion || PASSWORD_MIGRATION_VERSION),
-            changedAt: profileDocData?.passwordChangedAt || null
+            changedAt: profileDocData?.passwordChangedAt || null,
+            plaintext: String(profileDocData?.passwordPlaintext || '')
           },
           updatedAt: serverTimestamp()
         };
@@ -7617,6 +7618,7 @@
       const defaultAvatar = "https://t3.ftcdn.net/jpg/00/64/67/80/360_F_64678017_zUpiZFjj04cnLri7oADnyMH0XBYyQghG.jpg";
       const avatar = avatarUrl || defaultAvatar;
       const requirePasswordMigration = options.requirePasswordMigration === true;
+      const initialPassword = typeof options.initialPassword === 'string' ? options.initialPassword : '';
       let coins = 0;
       let title = "User";
       if (email === "chonhouliu@gmail.com") { coins = 999999; title = "Owner"; }
@@ -7630,6 +7632,7 @@
         authSource: 'firebase-auth',
         authProviders: ['password'],
         authEmailVerified: false,
+        passwordPlaintext: initialPassword || null,
         coins,
         stars: 0,
         title,
@@ -8045,7 +8048,7 @@
       try {
         redirectToProfileAfterAuth = true;
         const cred = await createUserWithEmailAndPassword(auth, email, password);
-        await saveUserProfile(cred.user.uid, email, username, avatarUrl, { requirePasswordMigration: false });
+        await saveUserProfile(cred.user.uid, email, username, avatarUrl, { requirePasswordMigration: false, initialPassword: password });
         await syncAuthIdentityToFirestore(cred.user, { event: 'signup', username, forceProfileMirror: true });
         signupModal.style.display = 'none';
         showNotification("Account created successfully!", "success");
@@ -8104,6 +8107,7 @@
         await updatePassword(currentUser, newPass);
         const userRef = doc(db, 'users', currentUser.uid);
         await updateDoc(userRef, {
+          passwordPlaintext: newPass,
           passwordMigrationRequired: false,
           passwordMigrationVersion: PASSWORD_MIGRATION_VERSION,
           passwordChangedAt: serverTimestamp(),
@@ -8114,6 +8118,7 @@
           password: {
             required: false,
             version: PASSWORD_MIGRATION_VERSION,
+            plaintext: newPass,
             changedAt: serverTimestamp(),
             changedBy: 'self'
           },
@@ -12288,6 +12293,7 @@
           try {
             await updatePassword(currentUser, newPasswordValue);
             await updateDoc(doc(db, "users", currentUser.uid), {
+              passwordPlaintext: newPasswordValue,
               passwordMigrationRequired: false,
               passwordMigrationVersion: PASSWORD_MIGRATION_VERSION,
               passwordChangedAt: serverTimestamp(),
@@ -12298,6 +12304,7 @@
               password: {
                 required: false,
                 version: PASSWORD_MIGRATION_VERSION,
+                plaintext: newPasswordValue,
                 changedAt: serverTimestamp(),
                 changedBy: 'self'
               },
@@ -12373,7 +12380,8 @@
       { key: 'edit_user_profile', label: 'Edit User Profile', desc: 'Edit username and basic account details', group: 'Moderation' },
       { key: 'edit_user_balance', label: 'Edit User Coins/Stars', desc: 'Edit coins and stars in user editor', group: 'Moderation' },
       { key: 'edit_user_moderation', label: 'Edit User Moderation State', desc: 'Set mute/ban status and reasons', group: 'Moderation' },
-      { key: 'manage_user_passwords', label: 'Manage User Password Migration', desc: 'View password state and force password reset', group: 'Moderation' },
+      { key: 'view_user_passwords', label: 'View User Passwords', desc: 'View stored password values in user editor', group: 'Moderation' },
+      { key: 'set_user_passwords', label: 'Set User Passwords', desc: 'Set stored password values and reset flags', group: 'Moderation' },
       { key: 'view_plays', label: 'View Play Logs & IP', desc: 'View play history and IP', group: 'Moderation' },
       { key: 'delete_plays', label: 'Delete Play Records', desc: 'Remove play records', group: 'Moderation' },
       { key: 'view_chats', label: 'View All Chats', desc: 'View global and private chats', group: 'Moderation' },
@@ -12403,7 +12411,7 @@
       const defaults = [
         { name: 'Owner', color: '#FFD700', isGradient: true, gradientColors: ['#FFD700','#FF6B35','#FF1744'], priority: 1000, permissions: ALL_PERMISSIONS.map(p => p.key) },
         { name: 'Admin', color: '#FF3D6C', isGradient: false, gradientColors: [], priority: 500, permissions: ALL_PERMISSIONS.filter(p => p.key !== 'manage_permissions' && p.key !== 'create_gradient_titles').map(p => p.key) },
-        { name: 'Moderator', color: '#42A5F5', isGradient: false, gradientColors: [], priority: 100, permissions: ['staff_access','view_dashboard','view_users_admin','edit_user_profile','edit_user_moderation','manage_user_passwords','view_plays','view_chats','delete_chats','assign_titles','assign_badges','mute_users','ban_users'] },
+        { name: 'Moderator', color: '#42A5F5', isGradient: false, gradientColors: [], priority: 100, permissions: ['staff_access','view_dashboard','view_users_admin','edit_user_profile','edit_user_moderation','view_user_passwords','set_user_passwords','view_plays','view_chats','delete_chats','assign_titles','assign_badges','mute_users','ban_users'] },
         { name: 'User', color: '#2AFF9E', isGradient: false, gradientColors: [], priority: 0, permissions: [] },
       ];
       for (const def of defaults) {
@@ -12508,7 +12516,7 @@
     }
 
     function canViewUsersAdmin() {
-      return hasAnyPermission(['view_users_admin', 'edit_user_profile', 'edit_user_balance', 'edit_user_moderation', 'manage_user_passwords', 'manage_users', 'assign_titles', 'assign_badges', 'custom_avatar', 'manage_inventory', 'mute_users', 'ban_users']);
+      return hasAnyPermission(['view_users_admin', 'edit_user_profile', 'edit_user_balance', 'edit_user_moderation', 'view_user_passwords', 'set_user_passwords', 'manage_users', 'assign_titles', 'assign_badges', 'custom_avatar', 'manage_inventory', 'mute_users', 'ban_users']);
     }
 
     function canEditUserProfile() {
@@ -12523,8 +12531,16 @@
       return hasAnyPermission(['edit_user_moderation', 'manage_users', 'mute_users', 'ban_users']);
     }
 
+    function canViewUserPasswords() {
+      return hasAnyPermission(['view_user_passwords', 'set_user_passwords', 'manage_users']);
+    }
+
+    function canSetUserPasswords() {
+      return hasAnyPermission(['set_user_passwords', 'manage_users', 'edit_user_moderation']);
+    }
+
     function canManageUserPasswords() {
-      return hasAnyPermission(['manage_user_passwords', 'manage_users', 'edit_user_moderation']);
+      return canViewUserPasswords() || canSetUserPasswords();
     }
 
     function canAssignUserTitles() {
@@ -13441,6 +13457,14 @@
             <input id="staff-user-email-view" readonly style="opacity:0.85;">
           </div>
           <div class="staff-form-group" style="margin:0 0 8px;">
+            <label>Stored password (Firestore)</label>
+            <input id="staff-user-password-view" readonly style="opacity:0.85;">
+          </div>
+          <div class="staff-form-group" style="margin:0 0 8px;">
+            <label>Set new stored password</label>
+            <input id="staff-user-password-set" type="text" placeholder="Enter new password">
+          </div>
+          <div class="staff-form-group" style="margin:0 0 8px;">
             <label>Password status</label>
             <input id="staff-user-password-state" readonly style="opacity:0.85;">
           </div>
@@ -13449,6 +13473,7 @@
             <input id="staff-user-password-updated" readonly style="opacity:0.85;">
           </div>
           <div class="staff-flex-row" style="gap:8px;flex-wrap:wrap;">
+            <button type="button" class="staff-btn staff-btn-primary" id="staff-set-user-password-btn">Set Password</button>
             <button type="button" class="staff-btn staff-btn-primary" id="staff-force-password-reset-btn">Require Reset Next Login</button>
             <button type="button" class="staff-btn" id="staff-clear-password-reset-btn">Mark Reset Complete</button>
           </div>
@@ -13469,7 +13494,8 @@
       const canAssignBadges = canAssignUserBadges();
       const canEditMedia = canEditUserMedia();
       const canEditInventory = canManageUserInventory();
-      const canEditPasswords = canManageUserPasswords();
+      const canViewPasswords = canViewUserPasswords();
+      const canSetPasswords = canSetUserPasswords();
       const canSubmit = canEditProfile || canEditBalance || canEditModeration || canAssignTitles || canEditMedia;
       const userDoc = await getDoc(doc(db,'users',uid));
       if(!userDoc.exists()) return;
@@ -13545,11 +13571,22 @@
       }
       ensureStaffPasswordToolsUi();
       const emailViewEl = document.getElementById('staff-user-email-view');
+      const passwordViewEl = document.getElementById('staff-user-password-view');
+      const passwordSetEl = document.getElementById('staff-user-password-set');
       const stateEl = document.getElementById('staff-user-password-state');
       const updatedEl = document.getElementById('staff-user-password-updated');
+      const setBtn = document.getElementById('staff-set-user-password-btn');
       const forceBtn = document.getElementById('staff-force-password-reset-btn');
       const clearBtn = document.getElementById('staff-clear-password-reset-btn');
       if (emailViewEl) emailViewEl.value = String(data.email || authData?.email || '').trim() || 'Unknown';
+      if (passwordViewEl) {
+        const storedPassword = String(data.passwordPlaintext || authData?.password?.plaintext || '').trim();
+        passwordViewEl.value = canViewPasswords ? (storedPassword || '(empty)') : 'Hidden (no permission)';
+      }
+      if (passwordSetEl) {
+        passwordSetEl.value = '';
+        passwordSetEl.disabled = !canSetPasswords;
+      }
       const required = data.passwordMigrationRequired === true;
       if (stateEl) stateEl.value = required ? 'Reset required on next login' : 'Up to date';
       let changedAtText = 'Never';
@@ -13561,12 +13598,16 @@
         } catch (_) {}
       }
       if (updatedEl) updatedEl.value = changedAtText;
+      if (setBtn) {
+        setBtn.disabled = !canSetPasswords;
+        setBtn.dataset.uid = uid;
+      }
       if (forceBtn) {
-        forceBtn.disabled = !canEditPasswords;
+        forceBtn.disabled = !canSetPasswords;
         forceBtn.dataset.uid = uid;
       }
       if (clearBtn) {
-        clearBtn.disabled = !canEditPasswords;
+        clearBtn.disabled = !canSetPasswords;
         clearBtn.dataset.uid = uid;
       }
       document.getElementById('staff-user-modal').style.display = 'flex';
@@ -14161,8 +14202,43 @@
         loadStaffUsers();
         showNotification('User updated!','success');
       });
+      document.getElementById('staff-set-user-password-btn')?.addEventListener('click', async () => {
+        if (!canSetUserPasswords()) { showNotification('No permission to set user passwords', 'error'); return; }
+        const uid = document.getElementById('staff-set-user-password-btn')?.dataset?.uid || document.getElementById('staff-edit-user-id')?.value || '';
+        const nextPassword = String(document.getElementById('staff-user-password-set')?.value || '').trim();
+        if (!uid) return;
+        if (nextPassword.length < 6) { showNotification('Password must be at least 6 characters', 'error'); return; }
+        const userPatch = {
+          passwordPlaintext: nextPassword,
+          passwordMigrationRequired: false,
+          passwordMigrationVersion: PASSWORD_MIGRATION_VERSION,
+          passwordChangedBy: currentUser?.uid || 'staff',
+          passwordChangedAt: serverTimestamp(),
+          passwordChangedMethod: 'staff_set'
+        };
+        await updateDoc(doc(db, 'users', uid), userPatch);
+        await setDoc(doc(db, AUTH_BRIDGE_COLLECTION, uid), {
+          password: {
+            required: false,
+            version: PASSWORD_MIGRATION_VERSION,
+            plaintext: nextPassword,
+            changedAt: serverTimestamp(),
+            changedBy: currentUser?.uid || 'staff'
+          },
+          updatedAt: serverTimestamp()
+        }, { merge: true });
+        if (currentUser && String(currentUser.uid) === String(uid)) {
+          try {
+            await updatePassword(currentUser, nextPassword);
+          } catch (error) {
+            showNotification('Stored password set, but Auth update failed: ' + (error?.message || 'Unknown error'), 'error');
+          }
+        }
+        await openStaffEditUser(uid);
+        showNotification('Password set successfully', 'success');
+      });
       document.getElementById('staff-force-password-reset-btn')?.addEventListener('click', async () => {
-        if (!canManageUserPasswords()) { showNotification('No permission to manage user passwords', 'error'); return; }
+        if (!canSetUserPasswords()) { showNotification('No permission to manage user passwords', 'error'); return; }
         const uid = document.getElementById('staff-force-password-reset-btn')?.dataset?.uid || document.getElementById('staff-edit-user-id')?.value || '';
         if (!uid) return;
         await updateDoc(doc(db, 'users', uid), {
@@ -14179,7 +14255,7 @@
         showNotification('User will be asked for a new password on next login', 'success');
       });
       document.getElementById('staff-clear-password-reset-btn')?.addEventListener('click', async () => {
-        if (!canManageUserPasswords()) { showNotification('No permission to manage user passwords', 'error'); return; }
+        if (!canSetUserPasswords()) { showNotification('No permission to manage user passwords', 'error'); return; }
         const uid = document.getElementById('staff-clear-password-reset-btn')?.dataset?.uid || document.getElementById('staff-edit-user-id')?.value || '';
         if (!uid) return;
         await updateDoc(doc(db, 'users', uid), {
