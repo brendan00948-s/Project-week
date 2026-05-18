@@ -6992,7 +6992,6 @@
       getAuth,     
       createUserWithEmailAndPassword,     
       signInWithEmailAndPassword,     
-      fetchSignInMethodsForEmail,
       signOut,     
       onAuthStateChanged,     
       updatePassword,     
@@ -8109,22 +8108,9 @@
     }
 
     async function probeLoginEmailForWizard(rawEmail) {
-      const email = String(rawEmail || '').trim();
-      if (!email) return { ok: false, code: 'empty' };
-      const emailLower = email.toLowerCase();
-      let methods = [];
-      try {
-        methods = await fetchSignInMethodsForEmail(auth, email);
-      } catch (e) {
-        console.warn('fetchSignInMethodsForEmail:', e);
-        methods = [];
-      }
-      const methodList = Array.isArray(methods) ? methods : [];
-      const hasUsableProvider = methodList.length > 0
-        && (methodList.includes('password') || methodList.includes('emailLink'));
-      if (methodList.length > 0 && !hasUsableProvider) {
-        return { ok: false, code: 'unsupported_provider' };
-      }
+      const email = String(rawEmail || '').trim().toLowerCase();
+      if (!email || !email.includes('@')) return { ok: false, code: 'empty' };
+      const emailLower = email;
       let loginPath = 'unknown';
       try {
         const bridgeQ = query(
@@ -8140,14 +8126,12 @@
           const required = pw.required === true;
           if (plain.length > 0 && !required) loginPath = 'firestore';
           else loginPath = 'auth_first';
-        } else if (hasUsableProvider) {
-          loginPath = 'auth_first';
         } else {
-          loginPath = 'unknown';
+          loginPath = 'auth_first';
         }
       } catch (e) {
         console.warn('Login path probe (authUsers):', e);
-        loginPath = hasUsableProvider ? 'auth_first' : 'unknown';
+        loginPath = 'unknown';
       }
       return { ok: true, email, loginPath };
     }
@@ -8166,11 +8150,7 @@
       try {
         const result = await probeLoginEmailForWizard(raw);
         if (!result.ok) {
-          if (result.code === 'unsupported_provider') {
-            showNotification('This account uses a sign-in method not supported on this screen.', 'error');
-          } else {
-            showNotification(result.message || 'Could not continue. Try again.', 'error');
-          }
+          showNotification(result.code === 'empty' ? 'Enter a valid email address' : (result.message || 'Could not continue. Try again.'), 'error');
           return;
         }
         loginWizardResolvedEmail = result.email;
@@ -8244,7 +8224,7 @@
     });
 
     document.getElementById('loginBtn')?.addEventListener('click', async () => {
-      const email = String(loginWizardResolvedEmail || '').trim();
+      const email = String(loginWizardResolvedEmail || '').trim().toLowerCase();
       const password = document.getElementById('loginPassword')?.value || '';
       if (!email || !password) {
         showNotification('Enter your password to continue', 'error');
@@ -14061,6 +14041,31 @@
       } catch(e) { container.innerHTML = '<p style="color:var(--neon-pink);">Error loading missions.</p>'; }
     }
 
+    /**
+     * Resolve a user uid from an email for staff tools — matches Firebase-style
+     * normalization (case-insensitive) and falls back to authUsers bridge doc id (= uid).
+     */
+    async function findUserUidByEmailLookup(emailRaw) {
+      const q = String(emailRaw || '').trim();
+      if (!q || !q.includes('@')) return null;
+      const lower = q.toLowerCase();
+      const tryQueries = [
+        () => getDocs(query(collection(db, 'users'), where('emailLower', '==', lower), limit(1))),
+        () => getDocs(query(collection(db, 'users'), where('email', '==', q), limit(1))),
+        () => getDocs(query(collection(db, 'users'), where('email', '==', lower), limit(1))),
+        () => getDocs(query(collection(db, AUTH_BRIDGE_COLLECTION), where('emailLower', '==', lower), limit(1)))
+      ];
+      for (const run of tryQueries) {
+        try {
+          const s = await run();
+          if (!s.empty) return s.docs[0].id;
+        } catch (e) {
+          console.warn('findUserUidByEmailLookup:', e);
+        }
+      }
+      return null;
+    }
+
     async function findUserByStaffLookup(raw) {
       const q = raw.trim();
       if (!q) return null;
@@ -14069,8 +14074,8 @@
         if (!s.empty) return s.docs[0].id;
       }
       if (q.includes('@')) {
-        const s = await getDocs(query(collection(db,'users'),where('email','==',q)));
-        if (!s.empty) return s.docs[0].id;
+        const uid = await findUserUidByEmailLookup(q);
+        if (uid) return uid;
       }
       const all = await getDocs(collection(db,'users'));
       const low = q.toLowerCase();
@@ -14601,7 +14606,7 @@
         const action = document.getElementById('staff-mod-action')?.value || 'open';
         const reason = document.getElementById('staff-mod-reason-quick')?.value.trim() || '';
         const uid = await findUserByStaffLookup(lookup);
-        if (!uid) { showNotification('User not found — try 6-digit ID, email, or exact username','error'); return; }
+        if (!uid) { showNotification('User not found — try 6-digit ID, email (any case), or username','error'); return; }
         if (action === 'open') { openStaffEditUser(uid); return; }
         const updates = { modReason: reason };
         const now = new Date();
@@ -14644,17 +14649,19 @@
         const action = document.getElementById('staff-stars-action').value;
         const amount = parseInt(document.getElementById('staff-stars-amount').value) || 0;
         if (!email) { showNotification('Enter email','error'); return; }
-        const snap = await getDocs(query(collection(db,'users'),where('email','==',email)));
-        if (snap.empty) { showNotification('User not found','error'); return; }
-        const uid = snap.docs[0].id;
-        const current = snap.docs[0].data().stars || 0;
+        const uid = await findUserUidByEmailLookup(email);
+        if (!uid) { showNotification('User not found','error'); return; }
+        const userSnap = await getDoc(doc(db, 'users', uid));
+        if (!userSnap.exists()) { showNotification('User not found','error'); return; }
+        const ud = userSnap.data() || {};
+        const current = ud.stars || 0;
         let newVal = current;
         if (action === 'set') newVal = amount;
         else if (action === 'add') newVal = current + amount;
         else if (action === 'remove') newVal = Math.max(0, current - amount);
         await updateDoc(doc(db,'users',uid),{stars:newVal});
         syncStarBadgesForUser(uid, newVal);
-        document.getElementById('staff-stars-result').innerHTML = `<span style="color:var(--neon-green);">✓ ${snap.docs[0].data().username}: ${current} → ${newVal} stars</span>`;
+        document.getElementById('staff-stars-result').innerHTML = `<span style="color:var(--neon-green);">✓ ${ud.username || 'user'}: ${current} → ${newVal} stars</span>`;
         showNotification('Stars updated!','success');
       });
 
