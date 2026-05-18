@@ -8028,18 +8028,12 @@
       return String(n).padStart(6, '0');
     }
 
-    function formatGameRouteKey(value) {
-      const n = toBoundedPositiveInt(value, MAX_GAME_KEY_ID);
-      if (n === null) return null;
-      return String(n).padStart(6, '0');
-    }
-
     function buildMovieWatchRouteUrl(year, categoryId, movieId) {
       const safeYear = Number.parseInt(year, 10) || new Date().getFullYear();
       const catPart = formatCategoryRouteId(categoryId);
       const moviePart = formatMovieRouteId(movieId);
       if (!catPart || !moviePart) return null;
-      return `https://macautraffic.com/movie/${encodeURIComponent(String(safeYear))}/${encodeURIComponent(catPart)}/${encodeURIComponent(moviePart)}`;
+      return makeAbsoluteUrl(`/movie/${encodeURIComponent(String(safeYear))}/${encodeURIComponent(catPart)}/${encodeURIComponent(moviePart)}`);
     }
 
     function makeAbsoluteUrl(rawHref) {
@@ -8052,48 +8046,39 @@
       }
     }
 
-    function formatHistoryLinkDisplay(href) {
-      const absolute = makeAbsoluteUrl(href);
-      if (!absolute) return '';
-      try {
-        const parsed = new URL(absolute);
-        return `${parsed.host}${parsed.pathname}${parsed.search}`;
-      } catch (_) {
-        return absolute;
-      }
-    }
-
     function getHistoryEntryLink(entry) {
       const type = String(entry?.entryType || entry?.itemType || '').toLowerCase() === 'movie' ? 'movie' : 'game';
       if (type === 'movie') {
+        const movieDocId = String(entry?.movieId || entry?.itemId || '').trim();
+        if (movieDocId) {
+          const previewHref = `games.html?page=movies-page&movie=${encodeURIComponent(movieDocId)}`;
+          return {
+            href: makeAbsoluteUrl(previewHref),
+            action: 'Open',
+            display: 'Movies preview'
+          };
+        }
         const year = toBoundedPositiveInt(entry?.releaseYear, 9999);
         const cat = toBoundedPositiveInt(entry?.categoryId, MAX_MOVIE_CATEGORY_ID);
         const mid = toBoundedPositiveInt(entry?.movieKey, MAX_MOVIE_KEY_ID);
         const watchHref = buildMovieWatchRouteUrl(year, cat, mid);
         if (watchHref) {
+          const y = Number.parseInt(String(year || ''), 10) || new Date().getFullYear();
           return {
             href: watchHref,
             action: 'Watch',
-            display: formatHistoryLinkDisplay(watchHref)
+            display: `Movie watch link (${y})`
           };
         }
-        const movieDocId = String(entry?.movieId || entry?.itemId || '').trim();
-        if (!movieDocId) return null;
-        const fallbackHref = `games.html?page=movies-page&movie=${encodeURIComponent(movieDocId)}`;
-        return {
-          href: makeAbsoluteUrl(fallbackHref),
-          action: 'Open',
-          display: formatHistoryLinkDisplay(fallbackHref)
-        };
+        return null;
       }
       const gameId = String(entry?.gameId || entry?.itemId || '').trim();
       if (!gameId) return null;
       const gameHref = `games.html?page=main-page&game=${encodeURIComponent(gameId)}`;
-      const gameKey = formatGameRouteKey(entry?.gameKey);
       return {
         href: makeAbsoluteUrl(gameHref),
         action: 'Play',
-        display: gameKey ? `GAME-${gameKey} | ${formatHistoryLinkDisplay(gameHref)}` : formatHistoryLinkDisplay(gameHref)
+        display: 'Game details'
       };
     }
 
