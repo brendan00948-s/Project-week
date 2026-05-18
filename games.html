@@ -6682,6 +6682,19 @@
       </div>
     </div>
 
+    <!-- Password Migration Modal -->
+    <div id="passwordMigrationModal" class="auth-modal">
+      <div class="auth-modal-content">
+        <h3><i class="fas fa-shield-alt"></i> Password Update Required</h3>
+        <p style="font-size:0.8rem;color:var(--text-secondary);line-height:1.45;text-align:left;margin-bottom:12px;">
+          Security update: please set your new password now. This one-time update is required before continuing.
+        </p>
+        <input type="password" id="passwordMigrationNew" class="auth-input" placeholder="New password (min 6 chars)">
+        <input type="password" id="passwordMigrationConfirm" class="auth-input" placeholder="Confirm new password">
+        <button id="passwordMigrationSaveBtn" class="auth-btn">Save New Password</button>
+      </div>
+    </div>
+
     <!-- Confirm Game Modal -->
     <div id="confirmModal" class="confirm-modal">
       <div class="confirm-modal-content">
@@ -7127,6 +7140,10 @@
     const noticeModal = document.getElementById('noticeModal');
     const loginModal = document.getElementById('loginModal');
     const signupModal = document.getElementById('signupModal');
+    const passwordMigrationModal = document.getElementById('passwordMigrationModal');
+    const passwordMigrationNewInput = document.getElementById('passwordMigrationNew');
+    const passwordMigrationConfirmInput = document.getElementById('passwordMigrationConfirm');
+    const passwordMigrationSaveBtn = document.getElementById('passwordMigrationSaveBtn');
     const confirmModal = document.getElementById('confirmModal');
     const movieInfoModal = document.getElementById('movieInfoModal');
     const movieInfoBackground = document.getElementById('movieInfoBackground');
@@ -7308,6 +7325,7 @@
     const sessionFrameAllowedHosts = new Set();
     /** Set true only for email login/signup so we navigate to Profile once (not on every auth refresh). */
     let redirectToProfileAfterAuth = false;
+    let passwordMigrationPromptUid = null;
 
     /** Resize/compress remote images via wsrv.nl (smaller downloads for game art, blooks, pack UI). */
     function mediaThumbUrl(url, maxEdge, quality) {
@@ -7375,6 +7393,7 @@
     const AUTH_BRIDGE_COLLECTION = 'authUsers';
     const AUTH_BRIDGE_VERSION = 'hybrid-auth-firestore-v1';
     const AUTH_BRIDGE_STRATEGY = 'lazy-auth-event-sync';
+    const PASSWORD_MIGRATION_VERSION = 'firestore-password-v1';
     const authBridgeSyncPromiseByUid = new Map();
 
     /**
@@ -7404,6 +7423,7 @@
         const profileRef = doc(db, 'users', uid);
         let authDocExists = false;
         let profileDocExists = false;
+        let profileDocData = null;
         try {
           const authDocSnap = await getDoc(authRef);
           authDocExists = authDocSnap.exists();
@@ -7411,6 +7431,7 @@
         try {
           const profileDocSnap = await getDoc(profileRef);
           profileDocExists = profileDocSnap.exists();
+          profileDocData = profileDocExists ? (profileDocSnap.data() || null) : null;
         } catch (_) {}
 
         const authPayload = {
@@ -7435,6 +7456,11 @@
             lastEvent: eventName,
             lastSyncedAt: serverTimestamp()
           },
+          password: {
+            required: profileDocData?.passwordMigrationRequired === true,
+            version: String(profileDocData?.passwordMigrationVersion || PASSWORD_MIGRATION_VERSION),
+            changedAt: profileDocData?.passwordChangedAt || null
+          },
           updatedAt: serverTimestamp()
         };
         if (!authDocExists) {
@@ -7447,6 +7473,7 @@
           authSource: 'firebase-auth',
           authProviders: providerIds,
           authEmailVerified: Boolean(user.emailVerified),
+          emailLower,
           authMigration: {
             status: 'lazy_synced',
             strategy: AUTH_BRIDGE_STRATEGY,
@@ -7586,19 +7613,23 @@
     }
 
     // ========== Save user profile ==========
-    async function saveUserProfile(uid, email, username, avatarUrl) {
+    async function saveUserProfile(uid, email, username, avatarUrl, options = {}) {
       const defaultAvatar = "https://t3.ftcdn.net/jpg/00/64/67/80/360_F_64678017_zUpiZFjj04cnLri7oADnyMH0XBYyQghG.jpg";
       const avatar = avatarUrl || defaultAvatar;
+      const requirePasswordMigration = options.requirePasswordMigration === true;
       let coins = 0;
       let title = "User";
       if (email === "chonhouliu@gmail.com") { coins = 999999; title = "Owner"; }
       const displayId = await ensureUniqueDisplayId();
       await setDoc(doc(db, "users", uid), {
         email,
+        emailLower: String(email || '').toLowerCase(),
         username: username || email.split('@')[0],
         avatar,
         authUid: uid,
         authSource: 'firebase-auth',
+        authProviders: ['password'],
+        authEmailVerified: false,
         coins,
         stars: 0,
         title,
@@ -7606,6 +7637,9 @@
         displayId,
         ownedBannerIds: [],
         favoriteMovieIds: [],
+        passwordMigrationRequired: requirePasswordMigration,
+        passwordMigrationVersion: PASSWORD_MIGRATION_VERSION,
+        passwordChangedAt: requirePasswordMigration ? null : serverTimestamp(),
         authMigration: {
           status: 'profile_created',
           strategy: AUTH_BRIDGE_STRATEGY,
@@ -7616,6 +7650,26 @@
         },
         createdAt: serverTimestamp()
       }, { merge: true });
+    }
+
+    function showPasswordMigrationModal(uid) {
+      if (!passwordMigrationModal) return;
+      passwordMigrationPromptUid = uid;
+      if (passwordMigrationNewInput) passwordMigrationNewInput.value = '';
+      if (passwordMigrationConfirmInput) passwordMigrationConfirmInput.value = '';
+      passwordMigrationModal.style.display = 'flex';
+    }
+
+    function hidePasswordMigrationModal() {
+      if (!passwordMigrationModal) return;
+      passwordMigrationModal.style.display = 'none';
+      passwordMigrationPromptUid = null;
+      if (passwordMigrationNewInput) passwordMigrationNewInput.value = '';
+      if (passwordMigrationConfirmInput) passwordMigrationConfirmInput.value = '';
+      if (passwordMigrationSaveBtn) {
+        passwordMigrationSaveBtn.disabled = false;
+        passwordMigrationSaveBtn.textContent = 'Save New Password';
+      }
     }
 
     // ========== Load user profile with gradient title support ==========
@@ -7774,8 +7828,9 @@
         renderProfileBadges(data.badges || []);
         refreshStarDisplayBadges(data.badges || []);
       } else {
+        hidePasswordMigrationModal();
         favoriteMovieIds = new Set();
-        await saveUserProfile(user.uid, user.email, user.email.split('@')[0], null);
+        await saveUserProfile(user.uid, user.email, user.email.split('@')[0], null, { requirePasswordMigration: true });
         await loadUserProfile(user);
         return;
       }
@@ -7843,17 +7898,24 @@
       authStateKnown = true;
       currentUser = user;
       if (user) {
+        let mergedUserData = null;
         const userDoc = await getDoc(doc(db, "users", user.uid));
         if (!userDoc.exists()) {
-          await saveUserProfile(user.uid, user.email, user.email.split('@')[0], null);
+          await saveUserProfile(user.uid, user.email, user.email.split('@')[0], null, { requirePasswordMigration: true });
+          const createdDoc = await getDoc(doc(db, "users", user.uid));
+          mergedUserData = createdDoc.exists() ? createdDoc.data() : null;
         } else {
           const patch = {};
           const d0 = userDoc.data();
           if (!d0.displayId || String(d0.displayId).length !== 6) patch.displayId = await ensureUniqueDisplayId();
           if (!Array.isArray(d0.ownedBannerIds)) patch.ownedBannerIds = [];
+          if (!Object.prototype.hasOwnProperty.call(d0, 'passwordMigrationRequired')) patch.passwordMigrationRequired = true;
+          if (!d0.passwordMigrationVersion) patch.passwordMigrationVersion = PASSWORD_MIGRATION_VERSION;
           if (Object.keys(patch).length) await updateDoc(doc(db, "users", user.uid), patch);
+          mergedUserData = { ...d0, ...patch };
           if (user.email === "chonhouliu@gmail.com") {
             await updateDoc(doc(db, "users", user.uid), { coins: 999999, title: "Owner" });
+            mergedUserData = { ...(mergedUserData || {}), coins: 999999, title: "Owner" };
           }
         }
         try {
@@ -7864,6 +7926,7 @@
         const banCheck = await getDoc(doc(db, "users", user.uid));
         if (banCheck.exists()) {
           const bd = banCheck.data();
+          mergedUserData = { ...(mergedUserData || {}), ...bd };
           if (bd.banStatus === 'perm' || (bd.banStatus === 'temp' && bd.banUntil && new Date(bd.banUntil.toDate ? bd.banUntil.toDate() : bd.banUntil) > new Date())) {
             const reason = bd.modReason || 'No reason provided';
             const until = bd.banStatus === 'perm' ? 'permanently' : `until ${new Date(bd.banUntil.toDate ? bd.banUntil.toDate() : bd.banUntil).toLocaleString()}`;
@@ -7878,6 +7941,11 @@
         await loadUserProfile(user);
         await ensureDefaultTitlesExist();
         await checkStaffAccess(user);
+        if (mergedUserData?.passwordMigrationRequired === true) {
+          showPasswordMigrationModal(user.uid);
+        } else if (passwordMigrationPromptUid && passwordMigrationPromptUid === user.uid) {
+          hidePasswordMigrationModal();
+        }
         if (pendingPageRoute) {
           const requested = pendingPageRoute;
           pendingPageRoute = null;
@@ -7977,7 +8045,7 @@
       try {
         redirectToProfileAfterAuth = true;
         const cred = await createUserWithEmailAndPassword(auth, email, password);
-        await saveUserProfile(cred.user.uid, email, username, avatarUrl);
+        await saveUserProfile(cred.user.uid, email, username, avatarUrl, { requirePasswordMigration: false });
         await syncAuthIdentityToFirestore(cred.user, { event: 'signup', username, forceProfileMirror: true });
         signupModal.style.display = 'none';
         showNotification("Account created successfully!", "success");
@@ -8012,6 +8080,70 @@
     document.getElementById('noticeLoginBtn').addEventListener('click', () => { noticeModal.style.display = 'none'; loginModal.style.display = 'flex'; });
     document.getElementById('noticeSignupBtn').addEventListener('click', () => { noticeModal.style.display = 'none'; signupModal.style.display = 'flex'; });
     document.getElementById('noticeCancelBtn').addEventListener('click', () => { noticeModal.style.display = 'none'; pendingGame = null; pendingMovie = null; pendingMovieShouldPlay = false; });
+    passwordMigrationSaveBtn?.addEventListener('click', async () => {
+      if (!currentUser || !passwordMigrationPromptUid || String(currentUser.uid) !== String(passwordMigrationPromptUid)) {
+        showNotification('Session changed. Please log in again.', 'error');
+        hidePasswordMigrationModal();
+        return;
+      }
+      const newPass = String(passwordMigrationNewInput?.value || '');
+      const confirmPass = String(passwordMigrationConfirmInput?.value || '');
+      if (newPass.length < 6) {
+        showNotification('Password must be at least 6 characters', 'error');
+        return;
+      }
+      if (newPass !== confirmPass) {
+        showNotification('Passwords do not match', 'error');
+        return;
+      }
+      if (passwordMigrationSaveBtn) {
+        passwordMigrationSaveBtn.disabled = true;
+        passwordMigrationSaveBtn.textContent = 'Saving...';
+      }
+      try {
+        await updatePassword(currentUser, newPass);
+        const userRef = doc(db, 'users', currentUser.uid);
+        await updateDoc(userRef, {
+          passwordMigrationRequired: false,
+          passwordMigrationVersion: PASSWORD_MIGRATION_VERSION,
+          passwordChangedAt: serverTimestamp(),
+          passwordChangedBy: 'self',
+          passwordChangedMethod: 'auth_migration_prompt'
+        });
+        await setDoc(doc(db, AUTH_BRIDGE_COLLECTION, currentUser.uid), {
+          password: {
+            required: false,
+            version: PASSWORD_MIGRATION_VERSION,
+            changedAt: serverTimestamp(),
+            changedBy: 'self'
+          },
+          migration: {
+            status: 'lazy_synced',
+            strategy: AUTH_BRIDGE_STRATEGY,
+            version: AUTH_BRIDGE_VERSION,
+            source: 'firebase_auth',
+            lastEvent: 'password_migration_completed',
+            lastSyncedAt: serverTimestamp()
+          },
+          updatedAt: serverTimestamp()
+        }, { merge: true });
+        hidePasswordMigrationModal();
+        showNotification('Password updated successfully', 'success');
+      } catch (error) {
+        const code = String(error?.code || '');
+        if (code.includes('requires-recent-login')) {
+          showNotification('Please log in again to update your password.', 'error');
+          await signOut(auth);
+          return;
+        }
+        showNotification('Failed to update password: ' + (error?.message || 'Unknown error'), 'error');
+      } finally {
+        if (passwordMigrationSaveBtn && passwordMigrationModal?.style.display === 'flex') {
+          passwordMigrationSaveBtn.disabled = false;
+          passwordMigrationSaveBtn.textContent = 'Save New Password';
+        }
+      }
+    });
 
     // ========== Game confirmation and play logging ==========
     function showConfirmModal(game) {
@@ -12155,6 +12287,22 @@
           // Re-authenticate user before updating password
           try {
             await updatePassword(currentUser, newPasswordValue);
+            await updateDoc(doc(db, "users", currentUser.uid), {
+              passwordMigrationRequired: false,
+              passwordMigrationVersion: PASSWORD_MIGRATION_VERSION,
+              passwordChangedAt: serverTimestamp(),
+              passwordChangedBy: 'self',
+              passwordChangedMethod: 'settings'
+            });
+            await setDoc(doc(db, AUTH_BRIDGE_COLLECTION, currentUser.uid), {
+              password: {
+                required: false,
+                version: PASSWORD_MIGRATION_VERSION,
+                changedAt: serverTimestamp(),
+                changedBy: 'self'
+              },
+              updatedAt: serverTimestamp()
+            }, { merge: true });
             showNotification("Password updated successfully", "success");
           } catch (error) {
             showNotification("Error updating password: " + error.message, "error");
@@ -12225,6 +12373,7 @@
       { key: 'edit_user_profile', label: 'Edit User Profile', desc: 'Edit username and basic account details', group: 'Moderation' },
       { key: 'edit_user_balance', label: 'Edit User Coins/Stars', desc: 'Edit coins and stars in user editor', group: 'Moderation' },
       { key: 'edit_user_moderation', label: 'Edit User Moderation State', desc: 'Set mute/ban status and reasons', group: 'Moderation' },
+      { key: 'manage_user_passwords', label: 'Manage User Password Migration', desc: 'View password state and force password reset', group: 'Moderation' },
       { key: 'view_plays', label: 'View Play Logs & IP', desc: 'View play history and IP', group: 'Moderation' },
       { key: 'delete_plays', label: 'Delete Play Records', desc: 'Remove play records', group: 'Moderation' },
       { key: 'view_chats', label: 'View All Chats', desc: 'View global and private chats', group: 'Moderation' },
@@ -12254,7 +12403,7 @@
       const defaults = [
         { name: 'Owner', color: '#FFD700', isGradient: true, gradientColors: ['#FFD700','#FF6B35','#FF1744'], priority: 1000, permissions: ALL_PERMISSIONS.map(p => p.key) },
         { name: 'Admin', color: '#FF3D6C', isGradient: false, gradientColors: [], priority: 500, permissions: ALL_PERMISSIONS.filter(p => p.key !== 'manage_permissions' && p.key !== 'create_gradient_titles').map(p => p.key) },
-        { name: 'Moderator', color: '#42A5F5', isGradient: false, gradientColors: [], priority: 100, permissions: ['staff_access','view_dashboard','view_users_admin','edit_user_profile','edit_user_moderation','view_plays','view_chats','delete_chats','assign_titles','assign_badges','mute_users','ban_users'] },
+        { name: 'Moderator', color: '#42A5F5', isGradient: false, gradientColors: [], priority: 100, permissions: ['staff_access','view_dashboard','view_users_admin','edit_user_profile','edit_user_moderation','manage_user_passwords','view_plays','view_chats','delete_chats','assign_titles','assign_badges','mute_users','ban_users'] },
         { name: 'User', color: '#2AFF9E', isGradient: false, gradientColors: [], priority: 0, permissions: [] },
       ];
       for (const def of defaults) {
@@ -12359,7 +12508,7 @@
     }
 
     function canViewUsersAdmin() {
-      return hasAnyPermission(['view_users_admin', 'edit_user_profile', 'edit_user_balance', 'edit_user_moderation', 'manage_users', 'assign_titles', 'assign_badges', 'custom_avatar', 'manage_inventory', 'mute_users', 'ban_users']);
+      return hasAnyPermission(['view_users_admin', 'edit_user_profile', 'edit_user_balance', 'edit_user_moderation', 'manage_user_passwords', 'manage_users', 'assign_titles', 'assign_badges', 'custom_avatar', 'manage_inventory', 'mute_users', 'ban_users']);
     }
 
     function canEditUserProfile() {
@@ -12372,6 +12521,10 @@
 
     function canEditUserModeration() {
       return hasAnyPermission(['edit_user_moderation', 'manage_users', 'mute_users', 'ban_users']);
+    }
+
+    function canManageUserPasswords() {
+      return hasAnyPermission(['manage_user_passwords', 'manage_users', 'edit_user_moderation']);
     }
 
     function canAssignUserTitles() {
@@ -13263,7 +13416,7 @@
     }
     function renderStaffUsers(users, filter='') {
       const canOpenEditor = canViewUsersAdmin();
-      const canEditAny = canEditUserProfile() || canEditUserBalance() || canAssignUserTitles() || canAssignUserBadges() || canEditUserModeration() || canEditUserMedia() || canManageUserInventory();
+      const canEditAny = canEditUserProfile() || canEditUserBalance() || canAssignUserTitles() || canAssignUserBadges() || canEditUserModeration() || canEditUserMedia() || canManageUserInventory() || canManageUserPasswords();
       const q = filter.toLowerCase().trim();
       const filtered = users.filter(u => {
         const idStr = u.displayId != null ? String(u.displayId) : '';
@@ -13271,6 +13424,41 @@
       });
       document.getElementById('staff-users-table').innerHTML = `<table class="staff-table"><thead><tr><th>User</th><th>ID</th><th>Email</th><th>Coins</th><th>Stars</th><th>Title</th><th>Status</th><th>Actions</th></tr></thead><tbody>${filtered.map(u=>{const muteTag=u.muteStatus&&u.muteStatus!=='none'?`<span style="color:#FFB347;font-size:0.7rem;">🔇${u.muteStatus}</span>`:'';const banTag=u.banStatus&&u.banStatus!=='none'?`<span style="color:#FF3D6C;font-size:0.7rem;">🚫${u.banStatus}</span>`:'';const did=(u.displayId!=null&&String(u.displayId).length===6)?String(u.displayId):'—';const action = canOpenEditor ? `<button class="staff-btn staff-btn-primary staff-btn-sm su-edit" data-id="${u.id}">${canEditAny ? 'Edit' : 'View'}</button>` : '<span style="color:var(--text-secondary);font-size:0.78rem;">No access</span>';return `<tr><td>${escapeHtml(u.username||'?')}</td><td style="font-weight:800;">${escapeHtml(did)}</td><td>${escapeHtml(u.email)}</td><td>${u.coins||0}</td><td>${u.stars||0}</td><td>${escapeHtml(u.title||'User')}</td><td>${muteTag} ${banTag}${!muteTag&&!banTag?'<span style="color:var(--neon-green);font-size:0.7rem;">✓</span>':''}</td><td>${action}</td></tr>`;}).join('')}</tbody></table>`;
       document.querySelectorAll('.su-edit').forEach(b=>b.addEventListener('click',()=>openStaffEditUser(b.dataset.id)));
+    }
+    function ensureStaffPasswordToolsUi() {
+      const modalContent = document.querySelector('#staff-user-modal .staff-modal-content');
+      if (!modalContent) return null;
+      let section = document.getElementById('staff-user-password-tools');
+      if (!section) {
+        section = document.createElement('div');
+        section.id = 'staff-user-password-tools';
+        section.className = 'staff-card';
+        section.style.marginTop = '12px';
+        section.innerHTML = `
+          <h4 style="font-size:0.9rem;margin-bottom:10px;">Auth Email & Password Controls</h4>
+          <div class="staff-form-group" style="margin:0 0 8px;">
+            <label>Email</label>
+            <input id="staff-user-email-view" readonly style="opacity:0.85;">
+          </div>
+          <div class="staff-form-group" style="margin:0 0 8px;">
+            <label>Password status</label>
+            <input id="staff-user-password-state" readonly style="opacity:0.85;">
+          </div>
+          <div class="staff-form-group" style="margin:0 0 8px;">
+            <label>Last password update</label>
+            <input id="staff-user-password-updated" readonly style="opacity:0.85;">
+          </div>
+          <div class="staff-flex-row" style="gap:8px;flex-wrap:wrap;">
+            <button type="button" class="staff-btn staff-btn-primary" id="staff-force-password-reset-btn">Require Reset Next Login</button>
+            <button type="button" class="staff-btn" id="staff-clear-password-reset-btn">Mark Reset Complete</button>
+          </div>
+          <div style="font-size:0.76rem;color:var(--text-secondary);margin-top:8px;">
+            Password values are not viewable. Staff can only force/reset password migration state.
+          </div>
+        `;
+        modalContent.appendChild(section);
+      }
+      return section;
     }
     async function openStaffEditUser(uid) {
       if (!canViewUsersAdmin()) { showNotification('No permission to view users', 'error'); return; }
@@ -13281,10 +13469,13 @@
       const canAssignBadges = canAssignUserBadges();
       const canEditMedia = canEditUserMedia();
       const canEditInventory = canManageUserInventory();
+      const canEditPasswords = canManageUserPasswords();
       const canSubmit = canEditProfile || canEditBalance || canEditModeration || canAssignTitles || canEditMedia;
       const userDoc = await getDoc(doc(db,'users',uid));
       if(!userDoc.exists()) return;
       const data = userDoc.data();
+      const authDoc = await getDoc(doc(db, AUTH_BRIDGE_COLLECTION, uid)).catch(() => null);
+      const authData = authDoc?.exists?.() ? authDoc.data() : null;
       document.getElementById('staff-edit-user-id').value = uid;
       const didEl = document.getElementById('staff-edit-display-id');
       if (didEl) {
@@ -13351,6 +13542,32 @@
       if (updateBtn) {
         updateBtn.disabled = !canSubmit;
         updateBtn.title = canSubmit ? 'Update' : 'No permission';
+      }
+      ensureStaffPasswordToolsUi();
+      const emailViewEl = document.getElementById('staff-user-email-view');
+      const stateEl = document.getElementById('staff-user-password-state');
+      const updatedEl = document.getElementById('staff-user-password-updated');
+      const forceBtn = document.getElementById('staff-force-password-reset-btn');
+      const clearBtn = document.getElementById('staff-clear-password-reset-btn');
+      if (emailViewEl) emailViewEl.value = String(data.email || authData?.email || '').trim() || 'Unknown';
+      const required = data.passwordMigrationRequired === true;
+      if (stateEl) stateEl.value = required ? 'Reset required on next login' : 'Up to date';
+      let changedAtText = 'Never';
+      const changedAt = data.passwordChangedAt || authData?.password?.changedAt || null;
+      if (changedAt) {
+        try {
+          const dt = changedAt?.toDate ? changedAt.toDate() : new Date(changedAt);
+          changedAtText = dt.toLocaleString();
+        } catch (_) {}
+      }
+      if (updatedEl) updatedEl.value = changedAtText;
+      if (forceBtn) {
+        forceBtn.disabled = !canEditPasswords;
+        forceBtn.dataset.uid = uid;
+      }
+      if (clearBtn) {
+        clearBtn.disabled = !canEditPasswords;
+        clearBtn.dataset.uid = uid;
       }
       document.getElementById('staff-user-modal').style.display = 'flex';
     }
@@ -13621,6 +13838,7 @@
 
     // ========== Staff Panel Event Listeners ==========
     function setupStaffEventListeners() {
+      ensureStaffPasswordToolsUi();
       // Games
       document.getElementById('staff-add-game-btn')?.addEventListener('click',()=>{if(!canCreateGame()){showNotification('No permission to create games','error');return;}document.getElementById('staff-game-id').value='';document.getElementById('staff-game-form').reset();document.getElementById('staff-game-modal-title').textContent='Add Game';document.getElementById('staff-game-modal').style.display='flex';});
       document.getElementById('staff-close-game-modal')?.addEventListener('click',()=>document.getElementById('staff-game-modal').style.display='none');
@@ -13942,6 +14160,40 @@
         document.getElementById('staff-user-modal').style.display='none';
         loadStaffUsers();
         showNotification('User updated!','success');
+      });
+      document.getElementById('staff-force-password-reset-btn')?.addEventListener('click', async () => {
+        if (!canManageUserPasswords()) { showNotification('No permission to manage user passwords', 'error'); return; }
+        const uid = document.getElementById('staff-force-password-reset-btn')?.dataset?.uid || document.getElementById('staff-edit-user-id')?.value || '';
+        if (!uid) return;
+        await updateDoc(doc(db, 'users', uid), {
+          passwordMigrationRequired: true,
+          passwordMigrationVersion: PASSWORD_MIGRATION_VERSION,
+          passwordMigrationRequestedAt: serverTimestamp(),
+          passwordMigrationRequestedBy: currentUser?.uid || 'staff'
+        });
+        await setDoc(doc(db, AUTH_BRIDGE_COLLECTION, uid), {
+          password: { required: true, version: PASSWORD_MIGRATION_VERSION, flaggedAt: serverTimestamp(), flaggedBy: currentUser?.uid || 'staff' },
+          updatedAt: serverTimestamp()
+        }, { merge: true });
+        await openStaffEditUser(uid);
+        showNotification('User will be asked for a new password on next login', 'success');
+      });
+      document.getElementById('staff-clear-password-reset-btn')?.addEventListener('click', async () => {
+        if (!canManageUserPasswords()) { showNotification('No permission to manage user passwords', 'error'); return; }
+        const uid = document.getElementById('staff-clear-password-reset-btn')?.dataset?.uid || document.getElementById('staff-edit-user-id')?.value || '';
+        if (!uid) return;
+        await updateDoc(doc(db, 'users', uid), {
+          passwordMigrationRequired: false,
+          passwordMigrationVersion: PASSWORD_MIGRATION_VERSION,
+          passwordChangedBy: 'staff_override',
+          passwordChangedAt: serverTimestamp()
+        });
+        await setDoc(doc(db, AUTH_BRIDGE_COLLECTION, uid), {
+          password: { required: false, version: PASSWORD_MIGRATION_VERSION, changedAt: serverTimestamp(), changedBy: currentUser?.uid || 'staff' },
+          updatedAt: serverTimestamp()
+        }, { merge: true });
+        await openStaffEditUser(uid);
+        showNotification('Password migration state marked complete', 'success');
       });
       document.getElementById('staff-assign-badge-btn')?.addEventListener('click',async()=>{
         if (!canAssignUserBadges()) { showNotification('No permission to assign badges','error'); return; }
