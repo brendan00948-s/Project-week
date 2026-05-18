@@ -8116,12 +8116,13 @@
       try {
         methods = await fetchSignInMethodsForEmail(auth, email);
       } catch (e) {
-        return { ok: false, code: 'lookup_failed', message: e?.message || String(e) };
+        console.warn('fetchSignInMethodsForEmail:', e);
+        methods = [];
       }
-      if (!methods.length) return { ok: false, code: 'no_account' };
-      const hasPassword = methods.includes('password');
-      const hasEmailLink = methods.includes('emailLink');
-      if (!hasPassword && !hasEmailLink) {
+      const methodList = Array.isArray(methods) ? methods : [];
+      const hasUsableProvider = methodList.length > 0
+        && (methodList.includes('password') || methodList.includes('emailLink'));
+      if (methodList.length > 0 && !hasUsableProvider) {
         return { ok: false, code: 'unsupported_provider' };
       }
       let loginPath = 'unknown';
@@ -8139,12 +8140,14 @@
           const required = pw.required === true;
           if (plain.length > 0 && !required) loginPath = 'firestore';
           else loginPath = 'auth_first';
-        } else {
+        } else if (hasUsableProvider) {
           loginPath = 'auth_first';
+        } else {
+          loginPath = 'unknown';
         }
       } catch (e) {
         console.warn('Login path probe (authUsers):', e);
-        loginPath = 'unknown';
+        loginPath = hasUsableProvider ? 'auth_first' : 'unknown';
       }
       return { ok: true, email, loginPath };
     }
@@ -8163,12 +8166,10 @@
       try {
         const result = await probeLoginEmailForWizard(raw);
         if (!result.ok) {
-          if (result.code === 'no_account') {
-            showNotification('No account found for that email. Sign up instead.', 'error');
-          } else if (result.code === 'unsupported_provider') {
+          if (result.code === 'unsupported_provider') {
             showNotification('This account uses a sign-in method not supported on this screen.', 'error');
           } else {
-            showNotification(result.message || 'Could not verify email. Try again.', 'error');
+            showNotification(result.message || 'Could not continue. Try again.', 'error');
           }
           return;
         }
