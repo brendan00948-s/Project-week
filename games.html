@@ -669,20 +669,26 @@
       --movies-panel-border: rgba(171, 207, 255, 0.16);
       --movies-text-muted: #b8c8de;
       --movies-accent: #55beff;
-      padding: 18px 0 48px;
+      --movies-page-max: 1320px;
+      padding: 18px 0 56px;
       background:
         radial-gradient(circle at 12% -16%, rgba(83, 136, 255, 0.22), transparent 42%),
-        radial-gradient(circle at 84% 1%, rgba(146, 87, 255, 0.14), transparent 34%);
+        radial-gradient(circle at 84% 1%, rgba(146, 87, 255, 0.14), transparent 34%),
+        linear-gradient(180deg, rgba(4, 7, 12, 0.4) 0%, rgba(4, 7, 12, 0.92) 100%);
     }
     .movies-page .movies-hero {
       position: relative;
-      margin: 0 5%;
-      border-radius: 22px;
+      margin: 0 auto;
+      width: min(100% - 32px, var(--movies-page-max));
+      border-radius: 24px;
       border: 1px solid var(--movies-panel-border);
       overflow: hidden;
-      min-height: 420px;
+      min-height: 440px;
       background: #070a11;
-      box-shadow: 0 22px 52px rgba(0, 0, 0, 0.42);
+      box-shadow:
+        0 22px 52px rgba(0, 0, 0, 0.42),
+        0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+        0 0 80px rgba(85, 190, 255, 0.06);
     }
     .movies-hero-shell {
       position: absolute;
@@ -692,9 +698,9 @@
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
-      gap: 14px;
-      padding: 28px 30px 24px;
-      background: linear-gradient(90deg, rgba(5, 8, 14, 0.86) 0%, rgba(5, 8, 14, 0.5) 46%, rgba(5, 8, 14, 0) 72%);
+      gap: 12px;
+      padding: 26px 32px 24px;
+      background: linear-gradient(115deg, rgba(5, 8, 14, 0.92) 0%, rgba(5, 8, 14, 0.55) 44%, rgba(5, 8, 14, 0.12) 68%, rgba(5, 8, 14, 0) 82%);
     }
     .movies-kicker {
       margin: 0;
@@ -704,21 +710,29 @@
       font-size: 0.66rem;
       color: #8fd6ff;
     }
+    .movies-heading-row {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      max-width: min(560px, 92vw);
+    }
     .movies-heading-row h2 {
-      margin: 8px 0 8px;
-      font-size: clamp(1.5rem, 2.8vw, 2.4rem);
+      margin: 0;
+      font-size: clamp(1.55rem, 2.9vw, 2.55rem);
       font-weight: 900;
-      letter-spacing: -0.02em;
+      letter-spacing: -0.03em;
       color: #f5f9ff;
       max-width: 540px;
-      line-height: 1.08;
+      line-height: 1.06;
+      text-shadow: 0 2px 28px rgba(0, 0, 0, 0.45);
     }
     .movies-overview {
       margin: 0;
-      max-width: 520px;
+      max-width: min(520px, 94vw);
       color: var(--movies-text-muted);
-      font-size: 0.86rem;
-      line-height: 1.5;
+      font-size: 0.88rem;
+      line-height: 1.55;
+      text-shadow: 0 1px 14px rgba(0, 0, 0, 0.5);
     }
     .movies-hero-stats {
       display: inline-flex;
@@ -749,7 +763,7 @@
       position: relative;
       width: 100%;
       height: 100%;
-      min-height: 420px;
+      min-height: 440px;
     }
     .movie-carousel-slide {
       position: absolute;
@@ -861,18 +875,34 @@
       box-shadow: 0 0 16px rgba(85, 190, 255, 0.52);
     }
     .movies-category-selector {
-      padding: 20px 5% 10px;
+      padding: 28px max(16px, calc((100% - var(--movies-page-max)) / 2)) 12px;
+      max-width: none;
     }
     .movies-section-head {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 14px;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
       flex-wrap: wrap;
     }
+    .movies-section-head h2 {
+      position: relative;
+      padding-left: 14px;
+    }
+    .movies-section-head h2::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0.15em;
+      bottom: 0.15em;
+      width: 4px;
+      border-radius: 99px;
+      background: linear-gradient(180deg, var(--movies-accent), rgba(146, 87, 255, 0.85));
+      box-shadow: 0 0 18px rgba(85, 190, 255, 0.35);
+    }
     .movies-category-selector h2 {
-      font-size: 1.2rem;
+      font-size: 1.22rem;
       font-weight: 800;
       margin: 0;
       color: #e9f2ff;
@@ -950,7 +980,14 @@
       transform: translateY(-50%);
     }
     .movies-list-shell {
-      padding: 12px 5% 0;
+      margin: 6px max(16px, calc((100% - var(--movies-page-max)) / 2)) 0;
+      padding: 22px 22px 28px;
+      border-radius: 20px;
+      border: 1px solid rgba(171, 207, 255, 0.14);
+      background: rgba(6, 10, 16, 0.58);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
     }
     .movies-search-row {
       margin-bottom: 14px;
@@ -1152,27 +1189,77 @@
       display: flex;
       align-items: stretch;
     }
+    .movie-info-shell.has-trailer .movie-info-background {
+      filter: saturate(1.05) brightness(0.38);
+      opacity: 0.55;
+    }
+    .movie-info-shell.has-trailer .movie-info-overlay {
+      background:
+        linear-gradient(90deg, rgba(4, 7, 12, 0.88) 0%, rgba(4, 7, 12, 0.62) 40%, rgba(4, 7, 12, 0.28) 72%, rgba(4, 7, 12, 0.12) 100%),
+        radial-gradient(circle at 14% 22%, rgba(85, 190, 255, 0.12), transparent 42%);
+    }
     .movie-info-background {
       position: absolute;
       inset: 0;
+      z-index: 0;
       background-color: #0b1018;
       background-size: cover;
       background-position: center;
       transform: scale(1.04);
       filter: saturate(1.08) brightness(0.62);
+      transition: opacity 0.35s ease, filter 0.35s ease;
+    }
+    .movie-info-trailer-stage {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      overflow: hidden;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.45s ease;
+    }
+    .movie-info-trailer-stage.is-active {
+      opacity: 1;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .movie-info-trailer-stage {
+        display: none !important;
+      }
+    }
+    .movie-info-trailer-frame {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 177.78vh;
+      min-width: 100%;
+      height: 56.25vw;
+      min-height: 100%;
+      max-width: none;
+      border: 0;
+      transform: translate(-50%, -50%) scale(1.06);
+      filter: saturate(1.15) brightness(0.55) blur(1.5px);
+      opacity: 0.95;
+    }
+    @supports (height: 100dvh) {
+      .movie-info-trailer-frame {
+        width: 177.78dvh;
+        height: 56.25dvw;
+      }
     }
     .movie-info-overlay {
       position: absolute;
       inset: 0;
+      z-index: 2;
       background:
         linear-gradient(90deg, rgba(4, 7, 12, 0.72) 0%, rgba(4, 7, 12, 0.52) 42%, rgba(4, 7, 12, 0.16) 74%, rgba(4, 7, 12, 0.04) 100%),
         radial-gradient(circle at 14% 20%, rgba(85, 190, 255, 0.18), transparent 40%);
+      pointer-events: none;
     }
     .movie-info-close {
       position: absolute;
       top: 22px;
       right: 24px;
-      z-index: 3;
+      z-index: 5;
       width: 42px;
       height: 42px;
       border-radius: 999px;
@@ -1191,7 +1278,7 @@
     }
     .movie-info-panel {
       position: relative;
-      z-index: 2;
+      z-index: 4;
       width: min(620px, 100%);
       height: 100%;
       padding: 110px 42px 52px;
@@ -5670,8 +5757,8 @@
         padding-top: 10px;
       }
       .movies-page .movies-hero {
-        margin: 0 3%;
-        min-height: 370px;
+        width: min(100% - 20px, var(--movies-page-max));
+        min-height: 400px;
       }
       .movies-hero-shell {
         padding: 18px 16px;
@@ -5683,7 +5770,7 @@
         font-size: 0.8rem;
       }
       .movie-carousel-container {
-        min-height: 370px;
+        min-height: 400px;
       }
       .movie-slide-content {
         max-width: 100%;
@@ -5708,6 +5795,10 @@
       .movies-result-summary {
         width: 100%;
         text-align: center;
+      }
+      .movies-list-shell {
+        margin: 6px 12px 0;
+        padding: 16px 14px 22px;
       }
       .movie-info-close {
         top: 16px;
@@ -6070,8 +6161,10 @@
     <div class="page movies-page" id="movies-page">
       <section class="hero movies-hero">
         <div class="movies-hero-shell">
+          <p class="movies-kicker">Spotlight &amp; catalogue</p>
           <div class="movies-heading-row">
             <h2>Movies</h2>
+            <p class="movies-overview">Pick a category, open a title for the pre-movie view, then start playback when you&rsquo;re signed in. Titles with a trailer link show subtle motion behind the details—no controls, just atmosphere.</p>
           </div>
           <div class="movies-hero-stats">
             <span class="movies-hero-stat"><strong id="moviesTotalCount">0</strong> Titles</span>
@@ -6420,6 +6513,7 @@
                 <div class="staff-form-group" style="margin:0;min-width:100px;"><label>Score</label><input id="staff-movie-score" type="number" min="0" max="10" step="0.1" value="8.0"></div>
                 <div class="staff-form-group" style="margin:0;min-width:180px;flex:1;"><label>Banner URL</label><input id="staff-movie-banner" placeholder="https://...jpg"></div>
                 <div class="staff-form-group" style="margin:0;min-width:180px;flex:1;"><label>Title Image URL</label><input id="staff-movie-title-image" placeholder="Optional: title logo image URL"></div>
+                <div class="staff-form-group" style="margin:0;min-width:200px;flex:1.2;"><label>Trailer (YouTube URL or ID)</label><input id="staff-movie-trailer" placeholder="Optional — plays behind pre-movie view"></div>
                 <div class="staff-form-group" style="margin:0;min-width:180px;flex:1;"><label>Movie URL (direct link)</label><input id="staff-movie-url" placeholder="https://..."></div>
                 <div class="staff-form-group" style="margin:0;min-width:260px;flex:2;flex-basis:100%;"><label>Description</label><textarea id="staff-movie-desc" rows="2" placeholder="Movie description for the pre-movie screen"></textarea></div>
                 <button type="button" class="staff-btn staff-btn-primary" id="staff-save-movie-btn" style="margin-bottom:2px;">Save Movie</button>
@@ -6914,8 +7008,11 @@
     </div>
 
     <div id="movieInfoModal" class="modal movie-info-modal">
-      <div class="movie-info-shell" role="dialog" aria-modal="true" aria-labelledby="movieInfoTitle">
+      <div class="movie-info-shell" id="movieInfoShell" role="dialog" aria-modal="true" aria-labelledby="movieInfoTitle">
         <div class="movie-info-background" id="movieInfoBackground"></div>
+        <div class="movie-info-trailer-stage" id="movieInfoTrailerStage" aria-hidden="true">
+          <iframe class="movie-info-trailer-frame" id="movieInfoTrailerFrame" title="" loading="eager" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; picture-in-picture"></iframe>
+        </div>
         <div class="movie-info-overlay"></div>
         <button type="button" class="movie-info-close" id="movieInfoCloseBtn" aria-label="Close movie details">×</button>
         <section class="movie-info-panel">
@@ -7208,6 +7305,9 @@
     const movieInfoWatchBtn = document.getElementById('movieInfoWatchBtn');
     const movieInfoBackBtn = document.getElementById('movieInfoBackBtn');
     const movieInfoCloseBtn = document.getElementById('movieInfoCloseBtn');
+    const movieInfoShell = document.getElementById('movieInfoShell');
+    const movieInfoTrailerStage = document.getElementById('movieInfoTrailerStage');
+    const movieInfoTrailerFrame = document.getElementById('movieInfoTrailerFrame');
     const gameModal = document.getElementById('gameModal');
     const gameFrame = document.getElementById('gameFrame');
     const gameModalTitle = document.getElementById('modalGameTitle');
@@ -7617,7 +7717,8 @@
         banner: String(raw.banner || raw.image || raw.poster || ''),
         titleImage: String(raw.titleImage || raw.titleLogo || raw.titleArt || raw.titleImageUrl || ''),
         description: String(raw.description || raw.desc || raw.synopsis || raw.overview || ''),
-        url: String(raw.url || raw.movieUrl || raw.fullMovieUrl || '')
+        url: String(raw.url || raw.movieUrl || raw.fullMovieUrl || ''),
+        trailerUrl: String(raw.trailerUrl || raw.trailer || raw.youtubeTrailer || raw.previewYoutube || raw.trailerLink || '')
       };
     }
 
@@ -8434,6 +8535,7 @@
 
     function closeMovieInfoModal(options = {}) {
       const wasOpen = movieInfoModal?.style.display === 'block';
+      stopMovieInfoTrailer();
       if (movieInfoModal) movieInfoModal.style.display = 'none';
       activeMoviePreview = null;
       const gameModalVisible = gameModal && gameModal.style.display === 'block';
@@ -8453,6 +8555,75 @@
       } catch (_) {
         return null;
       }
+    }
+
+    function extractYouTubeVideoId(input) {
+      const s = String(input || '').trim();
+      if (!s) return null;
+      if (/^[a-zA-Z0-9_-]{11}$/.test(s)) return s;
+      try {
+        const u = new URL(s, window.location.href);
+        const host = u.hostname.replace(/^www\./, '').toLowerCase();
+        if (host === 'youtu.be') {
+          const id = u.pathname.replace(/^\//, '').slice(0, 11);
+          return /^[a-zA-Z0-9_-]{11}$/.test(id) ? id : null;
+        }
+        if (host === 'youtube.com' || host === 'youtube-nocookie.com' || host === 'm.youtube.com' || host === 'music.youtube.com') {
+          const v = u.searchParams.get('v');
+          if (v && /^[a-zA-Z0-9_-]{11}$/.test(v)) return v;
+          const embed = u.pathname.match(/\/embed\/([a-zA-Z0-9_-]{11})/);
+          if (embed) return embed[1];
+          const shorts = u.pathname.match(/\/shorts\/([a-zA-Z0-9_-]{11})/);
+          if (shorts) return shorts[1];
+          const live = u.pathname.match(/\/live\/([a-zA-Z0-9_-]{11})/);
+          if (live) return live[1];
+        }
+      } catch (_) {}
+      return null;
+    }
+
+    function buildMovieTrailerEmbedSrc(videoId) {
+      const id = String(videoId || '').trim();
+      if (!/^[a-zA-Z0-9_-]{11}$/.test(id)) return '';
+      let originParam = '';
+      try {
+        originParam = `&origin=${encodeURIComponent(window.location.origin)}`;
+      } catch (_) {}
+      return `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&playsinline=1&disablekb=1&fs=0&iv_load_policy=3&showinfo=0&loop=1&playlist=${id}${originParam}`;
+    }
+
+    function prefersReducedMotionMedia() {
+      try {
+        return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      } catch (_) {
+        return false;
+      }
+    }
+
+    function stopMovieInfoTrailer() {
+      if (movieInfoTrailerFrame) {
+        movieInfoTrailerFrame.src = 'about:blank';
+        movieInfoTrailerFrame.removeAttribute('src');
+        movieInfoTrailerFrame.title = '';
+      }
+      movieInfoTrailerStage?.classList.remove('is-active');
+      movieInfoShell?.classList.remove('has-trailer');
+      if (movieInfoTrailerStage) movieInfoTrailerStage.setAttribute('aria-hidden', 'true');
+    }
+
+    function applyMovieInfoTrailer(movie) {
+      stopMovieInfoTrailer();
+      if (!movieInfoTrailerStage || !movieInfoTrailerFrame) return;
+      if (prefersReducedMotionMedia()) return;
+      const rawTrailer = String(movie?.trailerUrl || '').trim();
+      const videoId = extractYouTubeVideoId(rawTrailer);
+      const src = buildMovieTrailerEmbedSrc(videoId);
+      if (!src) return;
+      movieInfoShell?.classList.add('has-trailer');
+      movieInfoTrailerFrame.title = ' ';
+      movieInfoTrailerFrame.src = src;
+      movieInfoTrailerStage.classList.add('is-active');
+      movieInfoTrailerStage.setAttribute('aria-hidden', 'true');
     }
 
     function formatCategoryRouteId(value) {
@@ -8803,6 +8974,7 @@
       if (options.syncUrl !== false) {
         updateMoviesQueryParams({ movie: movie.id || null, play: null }, { pushHistory: Boolean(options.pushHistory) });
       }
+      applyMovieInfoTrailer(movie);
       movieInfoModal.style.display = 'block';
       document.body.style.overflow = 'hidden';
     }
@@ -13278,6 +13450,7 @@
       const titleImageEl = document.getElementById('staff-movie-title-image');
       const descEl = document.getElementById('staff-movie-desc');
       const urlEl = document.getElementById('staff-movie-url');
+      const trailerEl = document.getElementById('staff-movie-trailer');
       if (idEl) idEl.value = '';
       if (titleEl) titleEl.value = '';
       if (yearEl) yearEl.value = String(new Date().getFullYear());
@@ -13286,6 +13459,7 @@
       if (titleImageEl) titleImageEl.value = '';
       if (descEl) descEl.value = '';
       if (urlEl) urlEl.value = '';
+      if (trailerEl) trailerEl.value = '';
       populateStaffMovieCategorySelect();
     }
 
@@ -13423,6 +13597,8 @@
         document.getElementById('staff-movie-title-image').value = item.titleImage || '';
         document.getElementById('staff-movie-desc').value = item.description || '';
         document.getElementById('staff-movie-url').value = item.url || '';
+        const trailerField = document.getElementById('staff-movie-trailer');
+        if (trailerField) trailerField.value = item.trailerUrl || '';
       }));
       document.querySelectorAll('.smv-del').forEach((btn) => btn.addEventListener('click', async () => {
         if (!canDeleteMovie()) { showNotification('No permission to delete movies', 'error'); return; }
@@ -14161,6 +14337,7 @@
         const titleImage = document.getElementById('staff-movie-title-image')?.value.trim() || '';
         const description = document.getElementById('staff-movie-desc')?.value.trim() || '';
         const url = document.getElementById('staff-movie-url')?.value.trim() || '';
+        const trailerUrl = document.getElementById('staff-movie-trailer')?.value.trim() || '';
         const categoryCfg = staffMovieCategoriesCache.find((cat) => String(cat.key) === String(category));
         const existingMovie = id ? staffMoviesCache.find((movie) => String(movie.id) === String(id)) : null;
         const nextMovieKey = nextNumericKey(staffMoviesCache, (movie) => movie.movieKey, MAX_MOVIE_KEY_ID, 1);
@@ -14168,7 +14345,7 @@
         const categoryId = toBoundedPositiveInt(categoryCfg?.categoryId, MAX_MOVIE_CATEGORY_ID);
         if (!title) { showNotification('Movie title is required', 'error'); return; }
         if (!category) { showNotification('Create/select a movie category first', 'error'); return; }
-        const payload = { title, category, categoryId: categoryId !== null ? categoryId : 0, movieKey, releaseYear, score, banner, titleImage, description, url, updatedAt: serverTimestamp() };
+        const payload = { title, category, categoryId: categoryId !== null ? categoryId : 0, movieKey, releaseYear, score, banner, titleImage, description, url, trailerUrl, updatedAt: serverTimestamp() };
         try {
           if (id) await updateDoc(doc(db, 'movies', id), payload);
           else await addDoc(collection(db, 'movies'), { ...payload, createdAt: serverTimestamp() });
